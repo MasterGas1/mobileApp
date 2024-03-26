@@ -1,11 +1,19 @@
 import React, { useState } from 'react'
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
 import { Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+
+import { RootStackParams } from '../navigation/PrincipalStackNavigation';
 
 import { globalColors } from '../styles/globalVariables'
 import InputLogin from '../components/InputLogin'
 import Spacer from '../components/common/Spacer';
 
+type LoginScreenNavigationProp = StackNavigationProp<RootStackParams, 'LoginScreen'>
+
 const LoginScreen = () => {
+
+  const navigation = useNavigation<LoginScreenNavigationProp>()
 
   const [requestLogin, setRequestLogin] = useState({
     email: '',
@@ -53,6 +61,7 @@ const LoginScreen = () => {
 
             <TouchableOpacity
               style={styles.buttonSignUp}
+              onPress={() => navigation.navigate('SignupScreen')}
             >
                 <Text
                   style={styles.textButtonSignUp}
