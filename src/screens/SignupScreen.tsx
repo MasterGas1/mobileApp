@@ -1,4 +1,5 @@
-import { Dimensions, StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import { useEffect, useState } from 'react'
+import { Dimensions, StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { useNavigation } from '@react-navigation/native'
 
@@ -8,56 +9,89 @@ import { RootStackParams } from '../navigation/PrincipalStackNavigation'
 
 import { globalColors } from '../styles/globalVariables'
 import RegisterButton from '../components/common/RegisterButton'
+import { useForm } from '../hooks/useForm'
+import { useValidateSignup } from '../hooks/useSignup'
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParams, 'SignupScreen'>
 const SignupScreen = () => {
+
+    
     const navigation = useNavigation<LoginScreenNavigationProp>()
+
+    const [confirmPassword, setConfirmPassword] = useState('')
+    
+    const { name, lastName, email, password, form ,onChange } = useForm({
+        name: '',
+        lastName: '',
+        email: '',
+        password: '',
+    }) //This a hook to manage inputs
+    
+    const {errorName, errorLastName, 
+        errorEmail, errorPassword, isValid,
+        errorConfirmPassword, validateInput} = useValidateSignup({...form, confirmPassword}); //This a hook to validate inputs
+
+
+    const onPressRegister = () => {
+        validateInput();
+        if (isValid.current) { //validate if eveything is correct
+            navigation.navigate('FiscalScreen', {form}) //navigate to next screen and send the form
+        }
+    }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Registro</Text>
 
-      <View style={styles.containerForm}>
+      <ScrollView style={styles.containerForm}>
         <InputSignup 
             label="Nombre (s)"
             name='name'
-            value=''
-            onChangeText={() => {}}
+            value={name}
+            onChangeText={onChange}
+            isThereError={errorName}
         />
         <Spacer/>
         <InputSignup 
             label="Apellido (s)"
-            name='lastname'
-            value=''
-            onChangeText={() => {}}
+            name='lastName'
+            value={lastName}
+            onChangeText={onChange}
+            isThereError={errorLastName}
         />
         <Spacer/>
         <InputSignup 
             label="Correo electronico"
             name='email'
-            value=''
-            onChangeText={() => {}}
+            value={email}
+            onChangeText={onChange}
+            isThereError={errorEmail}
+            autoCapitalize='none'
         />
         <Spacer/>
         <InputSignup 
             label="Contraseña"
             name='password'
-            value=''
+            value={password}
             secureTextEntry
-            onChangeText={() => {}}
+            onChangeText={onChange}
+            isThereError={errorPassword}
+            autoCapitalize='none'
         />
         <Spacer/>
         <InputSignup 
             label="Confirmar contraseña"
             name='confirmPassword'
-            value=''
+            value={confirmPassword}
             secureTextEntry
-            onChangeText={() => {}}
+            onChangeText={setConfirmPassword}
+            isThereError={errorConfirmPassword}
+            autoCapitalize='none'
         />
-      </View>
+      </ScrollView>
       <RegisterButton
         label="SIGUIENTE"
-        onPress={() => navigation.navigate('FiscalScreen')}
+        onPress={() => onPressRegister()}
       />
       <Spacer/>
     </View>

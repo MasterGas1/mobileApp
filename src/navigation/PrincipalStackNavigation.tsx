@@ -4,10 +4,12 @@ import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
 import FiscalScreen from '../screens/FiscalScreen';
 
+import { UserSignUpScreenInterface } from '../interface/signupInterface';
+
 export type RootStackParams = {
     LoginScreen: undefined,
     SignupScreen: undefined,
-    FiscalScreen: undefined
+    FiscalScreen: UserSignUpScreenInterface
 } 
   
 const Stack = createStackNavigator<RootStackParams>()
