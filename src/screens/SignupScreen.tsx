@@ -1,22 +1,27 @@
-import { useEffect, useState } from 'react'
-import { Dimensions, StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native'
+import { useEffect, useState, useContext } from 'react'
+import { Dimensions, StyleSheet, Text, View, ScrollView } from 'react-native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { useNavigation } from '@react-navigation/native'
 
 import InputSignup from '../components/InputSignup'
 import Spacer from '../components/common/Spacer'
 import { RootStackParams } from '../navigation/PrincipalStackNavigation'
+import RegisterButton from '../components/common/RegisterButton'
 
 import { globalColors } from '../styles/globalVariables'
-import RegisterButton from '../components/common/RegisterButton'
+
 import { useForm } from '../hooks/useForm'
 import { useValidateSignup } from '../hooks/useSignup'
+
+import { Context as AuthContext} from '../context/AuthContext'
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParams, 'SignupScreen'>
 const SignupScreen = () => {
 
     
     const navigation = useNavigation<LoginScreenNavigationProp>()
+
+    const {clearErrorMessage} = useContext(AuthContext)
 
     const [confirmPassword, setConfirmPassword] = useState('')
     
@@ -32,6 +37,9 @@ const SignupScreen = () => {
         errorConfirmPassword, validateInput} = useValidateSignup({...form, confirmPassword}); //This a hook to validate inputs
 
 
+    useEffect(() => {
+        clearErrorMessage();
+    },[])
     const onPressRegister = () => {
         validateInput();
         if (isValid.current) { //validate if eveything is correct
