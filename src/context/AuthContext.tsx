@@ -25,7 +25,8 @@ type AuthContextProps = {
     state: AuthState,
     signup: (body: UserRequestInterface) => void,
     signin: (body: LoginInterface) => void,
-    clearErrorMessage: () => void
+    clearErrorMessage: () => void,
+    checkToken: () => void
 }
 const authReducer = (prevState: AuthState, action: AuthAction): AuthState => {
 
@@ -78,10 +79,20 @@ const clearErrorMessage = (dispatch: Dispatch<AuthAction>) => () => {
     dispatch({type: 'errorMessage', payload: {errorMessage: ''}})
 }
 
+const checkToken = (dispatch: Dispatch<AuthAction>) => async() => {
+
+    const token = await AsyncStorage.getItem('token')
+    const role = await AsyncStorage.getItem('role')
+    if(token && role) {
+        dispatch({type: 'signup', payload: {name: '', lastName: '', token: token, role: role}})
+    }
+}
+
 export const {Provider, Context} = dataContext<AuthContextProps>(authReducer, 
     { signup, 
       clearErrorMessage,
-      signin
+      signin,
+      checkToken
     }, 
     {
         token: null,
