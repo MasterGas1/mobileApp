@@ -40,7 +40,7 @@ export const useValidateSignup = ({name,lastName,email,password, confirmPassword
         isMounted.current = true
     },[name,lastName,password,email,confirmPassword])
 
-    const validateInput = async () => {
+    const validateInput = () => {
         setState({
             ...state,
             errorName: name.length > 3 ? '' : 'El nombre debe ser igual o mayor a 4 caracteres',

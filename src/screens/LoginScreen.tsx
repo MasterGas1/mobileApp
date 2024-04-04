@@ -1,13 +1,20 @@
-import React, { useState } from 'react'
+import { useContext } from 'react';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-import { Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 
 import { RootStackParams } from '../navigation/PrincipalStackNavigation';
 
-import { globalColors } from '../styles/globalVariables'
 import InputLogin from '../components/InputLogin'
 import Spacer from '../components/common/Spacer';
+
+import { globalColors } from '../styles/globalVariables'
+
+import { useForm } from '../hooks/useForm';
+import { useLogin } from '../hooks/useLogin';
+
+import { Context as AuthContext} from '../context/AuthContext'
+import ErrorAlert from '../components/common/ErrorAlert';
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParams, 'LoginScreen'>
 
@@ -15,13 +22,20 @@ const LoginScreen = () => {
 
   const navigation = useNavigation<LoginScreenNavigationProp>()
 
-  const [requestLogin, setRequestLogin] = useState({
+  const {state, signin} = useContext(AuthContext)
+
+  const {email, password, form, onChange} = useForm({
     email: '',
-    password: ''
+    password: '',
   })
 
+  const {errorEmail, errorPassword, isValid ,validateInput} = useLogin({email,password});
+
   const onSubmit = () => {
-    console.log(requestLogin)
+    validateInput();
+    if (isValid.current) {
+      signin(form)
+    }
   }
 
   return (
@@ -40,20 +54,34 @@ const LoginScreen = () => {
             <InputLogin 
               label="Correo electrónico"
               name='email'
-              text={requestLogin.email}
-              onChangeText={setRequestLogin}
+              text={email}
+              onChangeText={onChange}
+              autoCapitalize='none'
+              isThereError={errorEmail}
             />
             <Spacer/>
             <InputLogin 
               label="Contraseña"
               name='password'
               secureTextEntry
-              text={requestLogin.password}
-              onChangeText={setRequestLogin}
+              text={password}
+              onChangeText={onChange}
+              autoCapitalize='none'
+              isThereError={errorPassword}
             />
 
+            {
+                state.errorMessage 
+                ? <View style={{width: '80%', marginTop: 10}}>
+                    <ErrorAlert
+                        errorMessage={state.errorMessage}
+                    />
+                  </View> 
+                : null
+            }
+
             <TouchableOpacity
-              style={styles.button}
+              style={{...styles.button, marginTop: state.errorMessage ? 10 : '5%'}}
               onPress={onSubmit}
             >
               <Text style={styles.textButton}>INICIAR SESIÓN</Text>
@@ -95,7 +123,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   imageLogo: {
-    width: "50%",
+    width: "45%",
     resizeMode: "stretch",
     height: "70%"
   },
@@ -120,7 +148,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: '80%',
-    marginTop: "10%",
+    marginTop: "5%",
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
@@ -128,15 +156,15 @@ const styles = StyleSheet.create({
     backgroundColor: globalColors.thirdColor
   },
   textButton: {
-    fontSize: 20,
+    fontSize: Dimensions.get('window').width * 0.04,
     color: globalColors.principalColor,
     fontWeight: 'bold'
   },
   buttonSignUp: {
-    marginTop: 30
+    marginTop: "5%",
   },
   textButtonSignUp: {
-    fontSize: 25,
+    fontSize: Dimensions.get('window').width * 0.06,
     color: globalColors.thirdColor
   },
   restorePasswordButton: {
@@ -145,7 +173,7 @@ const styles = StyleSheet.create({
   },
   retorePasswordButtonText: {
     color: 'white',
-    fontSize: 20
+    fontSize: Dimensions.get('window').width * 0.04
   }
 })
 
