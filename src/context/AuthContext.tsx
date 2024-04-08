@@ -96,5 +96,6 @@ export const {Provider, Context} = dataContext<AuthContextProps>(authReducer,
     }, 
     {
         token: null,
-        errorMessage: ''
+        errorMessage: '',
+        role: null
     })
