@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, Linking, FlatList} from 'react-native'
 
 import Spacer from '../../../components/common/Spacer'
@@ -10,7 +10,11 @@ import ServiceButton from '../../../components/ServiceButton'
 
 const ServiceScreen = () => {
 
-  const {services, isLoading} = useService();
+  const {services, isLoading, getServices} = useService();
+
+  useEffect(() => {
+    getServices();
+  },[])
 
   const handleClickAdd = () => {
     Linking.openURL('https://mastergas23.com/');

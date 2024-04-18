@@ -1,5 +1,6 @@
 import { Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useState } from 'react';
 
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 
@@ -12,23 +13,18 @@ import { globalColors } from '../../styles/globalVariables';
 const Tab = createBottomTabNavigator();
 
 const CustomerNavigator = () => {
+
     return (
         <Tab.Navigator
             screenOptions={{
-                headerTitleAlign: 'left',
-                tabBarActiveTintColor: globalColors.principalColor,
-                headerStyle: {
-                    backgroundColor: globalColors.principalColor,
-                },
-                headerTitleStyle: {
-                    color: 'white',
-                    fontSize: Dimensions.get('window').width * 0.05
-                },
+                headerShown: false,
                 tabBarLabelStyle: {
                     fontSize: Dimensions.get('window').width * 0.03,
                     fontWeight: '600'
-                }
-            }}
+                },
+                tabBarActiveTintColor: globalColors.principalColor,
+            }
+        }
         >
             <Tab.Screen 
                 name="Servicios" 

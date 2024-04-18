@@ -1,23 +1,44 @@
-import React from 'react'
-import { StyleSheet, Text, View, Image, Dimensions } from 'react-native'
+import React, { useEffect } from 'react'
+import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, useAnimatedValue } from 'react-native'
+import { StackNavigationProp } from '@react-navigation/stack'
+import { useNavigation } from '@react-navigation/native'
 
 import { globalColors } from '../styles/globalVariables'
-import { TouchableOpacity } from 'react-native-gesture-handler'
+import { RootStackParams } from '../navigation/Customer/ServiceStackNavigator'
+
 
 interface ServiceButtonProps {
     name: string
     description: string
     image: string
     id: string
+    price ?: number
 }
 
-const ServiceButton = ({name, description, image, id}: ServiceButtonProps) => {
+type ServiceScreenNavigationProp = StackNavigationProp<RootStackParams, 'ServiceScreen'>
+
+const ServiceButton = ({name, description, image, id, price}: ServiceButtonProps) => {
+
+    const navigation = useNavigation<ServiceScreenNavigationProp>();
 
   return (
-    <TouchableOpacity style={styles.container}>
+    <TouchableOpacity 
+        style={styles.container}
+        onPress={() => {
+            if (!price) {
+                navigation.push('SubServiceScreen',{name, id, description, price})
+            } else {
+                navigation.navigate('DirectionScreen')
+            }
+        }}
+    >
         <View>
             <Text style={styles.nameText}>{name}</Text>
-            <Text style={styles.descriptionText}>{description}</Text>
+            {
+                price
+                ? <Text style={styles.priceText}>${price}</Text>
+                : null   
+            }
         </View>
         <View style={styles.imageContainer}>
             <Image
@@ -44,16 +65,19 @@ const styles = StyleSheet.create({
     nameText: {
         color: globalColors.principalColor,
         fontWeight: '600',
+        width: 200,
         fontSize: Dimensions.get('window').width * 0.045
     },
-    descriptionText: {
-        color: 'black',
+    priceText: {
+        color: globalColors.secondaryColor,
+        width: 200,
+        fontWeight: '500',
         fontSize: Dimensions.get('window').width * 0.04
     },
     image: {
         width: '80%',
         height: '100%',
-        resizeMode: 'stretch'
+        resizeMode: 'stretch',
     },
     imageContainer: {
         width: '30%',
