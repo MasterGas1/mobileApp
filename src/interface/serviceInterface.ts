@@ -3,6 +3,7 @@ export interface ServiceInterface {
     description: string;
     image:       string;
     type:        string;
+    price:       number;
     subServices: any[];
     available:   boolean;
     _id:         string;

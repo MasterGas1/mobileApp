@@ -9,12 +9,7 @@ export const useService = () => {
     const [services, setServices] = useState<ServiceInterface[]>([])
     const [isLoading, setIsLoading] = useState(true)
 
-    useEffect(() => {
-        getServices();
-    },[])
-
     const getServices = async () => {
-        
         try{
             const {data} = await dbApi.get<ServiceInterface[]>('/service');
             setServices(data)
@@ -24,8 +19,21 @@ export const useService = () => {
         }
     }
 
+    const getAllSubservices = async (id: string) => {
+        try {
+            setIsLoading(true);
+            const {data} = await dbApi.get<ServiceInterface[]>(`/service/subservices/${id}`);
+            setServices(data)
+            setIsLoading(false)
+        } catch(error) {
+            console.log(error)
+        }
+    }
+
     return {
         services,
-        isLoading
+        isLoading,
+        getServices,
+        getAllSubservices
     }
 }
