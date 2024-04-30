@@ -7,7 +7,7 @@ interface RegisterButtonProps {
     label: string,
     onPress: Function
 }
-const RegisterButton = ({label, onPress}: RegisterButtonProps) => {
+const PrincipalButton = ({label, onPress}: RegisterButtonProps) => {
   return (
     <TouchableOpacity 
         style={styles.containerButton}
@@ -35,4 +35,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default RegisterButton
+export default PrincipalButton

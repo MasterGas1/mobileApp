@@ -1,19 +1,24 @@
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, Linking, FlatList} from 'react-native'
+import { ActivityIndicator } from 'react-native-paper'
 
 import Spacer from '../../../components/common/Spacer'
-
-import { globalColors } from '../../../styles/globalVariables'
-import { useService } from '../../../hooks/useService'
-import { ActivityIndicator } from 'react-native-paper'
 import ServiceButton from '../../../components/ServiceButton'
 
+import { globalColors } from '../../../styles/globalVariables'
+
+import { useService } from '../../../hooks/useService'
+import { PermissionContext } from '../../../context/PermissionsContext'
+
 const ServiceScreen = () => {
+
+  const {askLocationPermission} = useContext(PermissionContext) 
 
   const {services, isLoading, getServices} = useService();
 
   useEffect(() => {
     getServices();
+    askLocationPermission();
   },[])
 
   const handleClickAdd = () => {

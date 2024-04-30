@@ -1,5 +1,4 @@
-import {createContext, Reducer, useReducer } from "react";
-import { AuthState } from "./AuthContext";
+import {createContext, useReducer } from "react";
 
 function dataContext<T>(reducer: any, actions: any, defaultValue: any) {
     const Context = createContext({} as T);

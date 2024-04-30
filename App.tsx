@@ -4,12 +4,15 @@ import { NavigationContainer } from '@react-navigation/native'
 import PrincipalStackNavigation from './src/navigation/PrincipalStackNavigation';
 
 import {Provider as AuthProvider} from './src/context/AuthContext';
+import { PermissionProvider } from './src/context/PermissionsContext';
 const App = () => {
   return (
       <AuthProvider>
-        <NavigationContainer>
-          <PrincipalStackNavigation/>
-        </NavigationContainer>
+        <PermissionProvider>
+          <NavigationContainer>
+            <PrincipalStackNavigation/>
+          </NavigationContainer>
+        </PermissionProvider>
       </AuthProvider>
   )
 }
