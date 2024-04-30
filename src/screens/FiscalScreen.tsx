@@ -6,7 +6,7 @@ import InputSignup from '../components/InputSignup'
 
 import { globalColors } from '../styles/globalVariables'
 import Spacer from '../components/common/Spacer'
-import RegisterButton from '../components/common/RegisterButton'
+import RegisterButton from '../components/common/PrincipalButton'
 
 import { Context as AuthContext} from '../context/AuthContext'
 import { useForm } from '../hooks/useForm'

@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native'
 import InputSignup from '../components/InputSignup'
 import Spacer from '../components/common/Spacer'
 import { RootStackParams } from '../navigation/PrincipalStackNavigation'
-import RegisterButton from '../components/common/RegisterButton'
+import PrincipalButton from '../components/common/PrincipalButton'
 
 import { globalColors } from '../styles/globalVariables'
 
@@ -97,7 +97,7 @@ const SignupScreen = () => {
             autoCapitalize='none'
         />
       </ScrollView>
-      <RegisterButton
+      <PrincipalButton
         label="SIGUIENTE"
         onPress={() => onPressRegister()}
       />

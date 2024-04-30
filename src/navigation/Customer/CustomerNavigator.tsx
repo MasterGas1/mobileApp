@@ -1,6 +1,5 @@
 import { Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useState } from 'react';
 
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 
