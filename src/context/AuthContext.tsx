@@ -17,7 +17,7 @@ export interface AuthState {
 
 export type AuthAction = 
     | {type: 'signup', payload: {name: string, lastName: string, token: string, role: string}}
-    | {type: 'logOut', payload: {}}
+    | {type: 'logout', payload: {}}
     | {type: 'errorMessage', payload: {errorMessage: string}}
 
 
@@ -25,6 +25,7 @@ type AuthContextProps = {
     state: AuthState,
     signup: (body: UserRequestInterface) => void,
     signin: (body: LoginInterface) => void,
+    signout: () => void,
     clearErrorMessage: () => void,
     checkToken: () => void
 }
@@ -35,6 +36,12 @@ const authReducer = (prevState: AuthState, action: AuthAction): AuthState => {
             return {
                 token: action.payload.token,
                 role: action.payload.role,
+                errorMessage: ''
+            }
+        case 'logout':
+            return {
+                token: null,
+                role: null,
                 errorMessage: ''
             }
         case 'errorMessage':
@@ -75,6 +82,12 @@ const signin = (dispatch: Dispatch<AuthAction>) => async(body: LoginInterface) =
     }
 }
 
+const signout = (dispatch: Dispatch<AuthAction>) => async() => {
+    await AsyncStorage.removeItem('token');
+    await AsyncStorage.removeItem('role');
+    dispatch({type: 'logout', payload: {}})
+}
+
 const clearErrorMessage = (dispatch: Dispatch<AuthAction>) => () => {
     dispatch({type: 'errorMessage', payload: {errorMessage: ''}})
 }
@@ -92,6 +105,7 @@ export const {Provider, Context} = dataContext<AuthContextProps>(authReducer,
     { signup, 
       clearErrorMessage,
       signin,
+      signout,
       checkToken
     }, 
     {

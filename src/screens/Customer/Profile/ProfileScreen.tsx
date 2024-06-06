@@ -1,14 +1,15 @@
-import React from 'react'
-import { StyleSheet, Text, View, Image, TouchableOpacity, } from 'react-native'
+import React, { useContext } from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { StyleSheet, Text, View, Image, TouchableOpacity, } from 'react-native'
+
 import { globalColors } from '../../../styles/globalVariables'
 import CustomOption from '../../../components/CustomOption';
-interface OptionProps {
-  icon: string;
-  text: string;
-}
+
+import { Context as AuthContext } from '../../../context/AuthContext';
 
 const ProfileScreen = () => {
+
+  const { signout } = useContext(AuthContext)
 
   return (
     <View style={styles.container}>
@@ -24,9 +25,9 @@ const ProfileScreen = () => {
         <Text style={styles.profileName}>Adela Micha</Text>
       </View>
       <View style={styles.optionsSection}>
-        <CustomOption icon="pencil-outline" text="Editar perfil" />
-        <CustomOption icon="key" text="Cambiar contraseña" />
-        <CustomOption icon="exit" text="Cerrar sesión" />
+        <CustomOption icon="pencil-outline" text="Editar perfil" onPress={() => {}}/>
+        <CustomOption icon="key" text="Cambiar contraseña"  onPress={() => {}}/>
+        <CustomOption icon="exit" text="Cerrar sesión"  onPress={signout}/>
       </View>
     </View>
   );
@@ -38,7 +39,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   header: {
-    height: 240,
+    height: "30%",
     backgroundColor: globalColors.principalColor,
   },
   profileSection: {

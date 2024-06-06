@@ -6,19 +6,18 @@ import { globalColors } from '../styles/globalVariables';
 interface OptionProps {
     icon: string;
     text: string;
+    onPress: () => void
 }
 
-const CustomOption = (props: OptionProps) => {
-
-    const { icon, text } = props
+const CustomOption = ({icon, text, onPress}: OptionProps) => {
 
     return (
-        <View style={styles.optionContainer}>
-            <TouchableOpacity>
-                <Ionicons name={icon} size={25} color={'white'} style={styles.optionIcon} />
-            </TouchableOpacity>
+        <TouchableOpacity style={styles.optionContainer} onPress={() => onPress()}>
+            <View style={styles.optionIcon}>
+                <Ionicons name={icon} size={25} color={'white'}/>
+            </View>
             <Text style={styles.optionText}>{text}</Text>
-        </View>
+        </TouchableOpacity>
     )
 };
 
