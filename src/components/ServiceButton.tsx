@@ -13,11 +13,12 @@ interface ServiceButtonProps {
     image: string
     id: string
     price ?: number
+    type: string
 }
 
 type ServiceScreenNavigationProp = StackNavigationProp<RootStackParams, 'ServiceScreen'>
 
-const ServiceButton = ({name, description, image, id, price}: ServiceButtonProps) => {
+const ServiceButton = ({name, description, image, id, price, type}: ServiceButtonProps) => {
 
     const navigation = useNavigation<ServiceScreenNavigationProp>();
 
@@ -25,7 +26,7 @@ const ServiceButton = ({name, description, image, id, price}: ServiceButtonProps
     <TouchableOpacity 
         style={styles.container}
         onPress={() => {
-            if (!price) {
+            if (type === 'root service' || type === 'subservice') {
                 navigation.push('SubServiceScreen',{name, id, description, price})
             } else {
                 navigation.navigate('DirectionScreen')
@@ -35,7 +36,7 @@ const ServiceButton = ({name, description, image, id, price}: ServiceButtonProps
         <View>
             <Text style={styles.nameText}>{name}</Text>
             {
-                price
+                type === 'price' || type === 'root service price'
                 ? <Text style={styles.priceText}>${price}</Text>
                 : null   
             }
@@ -61,12 +62,13 @@ const styles = StyleSheet.create({
         padding: 10,
         flexDirection: 'row',
         justifyContent: 'space-between',
+        marginTop: 10
     },
     nameText: {
         color: globalColors.principalColor,
         fontWeight: '600',
         width: 200,
-        fontSize: Dimensions.get('window').width * 0.045
+        fontSize: Dimensions.get('window').width * 0.04
     },
     priceText: {
         color: globalColors.secondaryColor,
