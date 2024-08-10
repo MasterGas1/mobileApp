@@ -60,6 +60,12 @@ const ModalAddress = ({isOpen, setIsOpen}: ModalAddressProps) => {
     },[isOpen])
 
     useEffect(() => {
+        if(addressName === '') {
+            onChange('','name')
+        }
+    },[addressName])
+
+    useEffect(() => {
         if(name === '') {
             setErrorName('El nombre es requerido')
 
