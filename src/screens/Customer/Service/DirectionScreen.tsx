@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
+import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -7,23 +7,38 @@ import { globalColors } from '../../../styles/globalVariables'
 
 import { useLocation } from '../../../hooks/useLocation';
 import PrincipalButton from '../../../components/common/PrincipalButton';
+import ModalAddress from '../../../components/ModalAddress';
+
+import { Context as AddressContext, getAddresses } from '../../../context/AddressContext';
+import AddressButton from '../../../components/AddressButton';
 
 const DirectionScreen = () => {
 
-  const { getCurrentLocation, location, address } = useLocation();
+  const { state, getAddresses } = useContext(AddressContext)
+
+  const { getCurrentLocation, setNewLocation, location, address } = useLocation();
+
+  const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
     getCurrentLocation()
+    getAddresses()
   },[])
 
   useEffect(() => {
-    console.log(location)
-  },[location])
+    setIsOpen(false)
+  },[state.addresses])
 
   return (
     <View
       style={styles.container}
     >
+
+      <ModalAddress
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+      />
+
       <MapView
         initialRegion={{
           latitude: location.latitude,
@@ -55,6 +70,7 @@ const DirectionScreen = () => {
 
         <TouchableOpacity
           style={styles.buttonAdd}
+          onPress={() => setIsOpen(true)}
         >
           <Icon
             name='add'
@@ -63,6 +79,21 @@ const DirectionScreen = () => {
           />
         </TouchableOpacity>
       </View>
+
+      <Text style={styles.textTitleList}>Direcciones guardas</Text>
+      <FlatList
+          data={state.addresses}
+          keyExtractor={(item) => item._id}
+          style={styles.containerList}
+          renderItem={({ item }) => (
+            <AddressButton
+              name={item.name}
+              addressName={item.addressName}
+              key={item._id}
+              onPress={() => setNewLocation(item.coords.latitude, item.coords.longitude)}
+            />
+          )}
+        />
 
       <PrincipalButton
         label="Siguiente"
@@ -87,7 +118,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    flex: 1
   },
   textTitleDirection: {
     fontSize: Dimensions.get('window').width * 0.04,
@@ -108,6 +138,18 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  textTitleList: {
+    fontSize: Dimensions.get('window').width * 0.04,
+    textAlign: 'left',
+    marginTop: 10,
+    fontWeight: 'bold',
+    color: 'black',
+    width: "100%",
+    marginBottom: 10
+  },
+  containerList: {
+    width: "100%"
   }
 })
 

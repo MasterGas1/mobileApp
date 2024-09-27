@@ -11,7 +11,7 @@ export const useService = () => {
 
     const getServices = async () => {
         try{
-            const {data} = await dbApi.get<ServiceInterface[]>('/service');
+            const {data} = await dbApi.get<ServiceInterface[]>('/service/rootServices?available=true');
             setServices(data)
             setIsLoading(false)
         } catch(error) {
@@ -22,8 +22,9 @@ export const useService = () => {
     const getAllSubservices = async (id: string) => {
         try {
             setIsLoading(true);
-            const {data} = await dbApi.get<ServiceInterface[]>(`/service/subservices/${id}`);
-            setServices(data)
+            const {data} = await dbApi.get<ServiceInterface>(`/service/${id}`);
+            console.log(data)
+            setServices(data.subservicesId)
             setIsLoading(false)
         } catch(error) {
             console.log(error)

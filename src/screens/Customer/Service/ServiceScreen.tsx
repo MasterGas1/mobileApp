@@ -51,6 +51,8 @@ const ServiceScreen = () => {
                 description={item.description}
                 image={item.image}
                 id={item._id}
+                price={item.price}
+                type={item.type}
               />}
               keyExtractor={item => item._id}
             />

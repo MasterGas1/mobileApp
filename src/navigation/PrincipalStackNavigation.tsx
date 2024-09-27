@@ -42,7 +42,7 @@ const PrincipalStackNavigation = () => {
             <Stack.Screen name='SignupScreen' component={SignupScreen} />
             <Stack.Screen name='FiscalScreen' component={FiscalScreen} />
            </>
-         :  state.role === 'customer' 
+         :  state.role === 'Customer' 
               ? <Stack.Screen name="CustomerNavigator" component={CustomerNavigator} />
               : <Stack.Screen name="InstallerNavigator" component={InstallerNavigator} />
       }
