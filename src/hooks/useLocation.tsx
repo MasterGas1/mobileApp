@@ -19,12 +19,17 @@ export const useLocation = () => {
                 setCurrentLocation({latitude: coords.latitude, longitude: coords.longitude})
            })
    }
+
+   const setNewLocation = (latitude: number, longitude: number) => {
+        setLocation({latitude, longitude})
+   }
   
     return {
         location,
         address,
         currentLocation,
         currentAddress,
-        getCurrentLocation
+        getCurrentLocation,
+        setNewLocation
     }
 }

@@ -57,7 +57,7 @@ const authReducer = (prevState: AuthState, action: AuthAction): AuthState => {
 const signup = (dispatch: Dispatch<AuthAction>) => async(body: UserRequestInterface) => {
     try {
 
-        const {data} = await dbApi.post<UserResponseInterface>('/user/customer', body)
+        const {data} = await dbApi.post<UserResponseInterface>('/customer', body)
         dispatch({type: 'signup', payload: {name: data.name, lastName: data.lastName, token: data.token, role: data.role}})
 
         await AsyncStorage.setItem('token', data.token);
@@ -76,10 +76,8 @@ const signin = (dispatch: Dispatch<AuthAction>) => async(body: LoginInterface) =
         await AsyncStorage.setItem('token', data.token);
         await AsyncStorage.setItem('role', data.role);
     }catch(error: any) {
-        console.log(error.response.data)
-        if (error.response.data) {
-            dispatch({type: 'errorMessage', payload: {errorMessage: error.response.data.message}})
-        }
+        console.log(error)
+
     }
 }
 
@@ -97,6 +95,8 @@ const checkToken = (dispatch: Dispatch<AuthAction>) => async() => {
 
     const token = await AsyncStorage.getItem('token')
     const role = await AsyncStorage.getItem('role')
+
+    console.log(role)
     if(token && role) {
         dispatch({type: 'signup', payload: {name: '', lastName: '', token: token, role: role}})
     }
