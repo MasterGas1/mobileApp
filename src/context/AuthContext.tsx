@@ -77,6 +77,7 @@ const signin = (dispatch: Dispatch<AuthAction>) => async(body: LoginInterface) =
         await AsyncStorage.setItem('role', data.role);
     }catch(error: any) {
         console.log(error)
+
     }
 }
 
