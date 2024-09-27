@@ -71,11 +71,12 @@ const signup = (dispatch: Dispatch<AuthAction>) => async(body: UserRequestInterf
 
 const signin = (dispatch: Dispatch<AuthAction>) => async(body: LoginInterface) => {
     try {
-        const {data} = await dbApi.post<UserResponseInterface>('/user/auth', body)
+        const {data} = await dbApi.post<UserResponseInterface>('/auth', body)
         dispatch({type: 'signup', payload: {name: data.name, lastName: data.lastName, token: data.token, role: data.role}})
         await AsyncStorage.setItem('token', data.token);
         await AsyncStorage.setItem('role', data.role);
     }catch(error: any) {
+        console.log(error.response.data)
         if (error.response.data) {
             dispatch({type: 'errorMessage', payload: {errorMessage: error.response.data.message}})
         }
