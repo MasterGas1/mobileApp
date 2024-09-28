@@ -40,6 +40,7 @@ const SubServiceScreen = ({route, navigation}:Props) => {
                 image={item.image}
                 id={item._id}
                 price={item.price}
+                type={item.type}
               />}
               keyExtractor={item => item._id}
             />

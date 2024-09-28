@@ -5,13 +5,16 @@ import PrincipalStackNavigation from './src/navigation/PrincipalStackNavigation'
 
 import {Provider as AuthProvider} from './src/context/AuthContext';
 import { PermissionProvider } from './src/context/PermissionsContext';
+import { Provider as AddressProvider } from './src/context/AddressContext';
 const App = () => {
   return (
       <AuthProvider>
         <PermissionProvider>
-          <NavigationContainer>
-            <PrincipalStackNavigation/>
-          </NavigationContainer>
+          <AddressProvider>
+            <NavigationContainer>
+              <PrincipalStackNavigation/>
+            </NavigationContainer>
+          </AddressProvider>
         </PermissionProvider>
       </AuthProvider>
   )

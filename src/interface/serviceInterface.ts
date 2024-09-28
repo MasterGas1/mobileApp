@@ -4,9 +4,8 @@ export interface ServiceInterface {
     image:       string;
     type:        string;
     price:       number;
-    subServices: any[];
+    subservicesId: any[];
     available:   boolean;
     _id:         string;
-    deleted:     boolean;
     __v:         number;
 }
