@@ -2,17 +2,24 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import Icon from 'react-native-vector-icons/Ionicons';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
 
 import { globalColors } from '../../../styles/globalVariables'
 
 import { useLocation } from '../../../hooks/useLocation';
 import PrincipalButton from '../../../components/common/PrincipalButton';
 import ModalAddress from '../../../components/ModalAddress';
-
-import { Context as AddressContext, getAddresses } from '../../../context/AddressContext';
 import AddressButton from '../../../components/AddressButton';
 
+import { Context as AddressContext, getAddresses } from '../../../context/AddressContext';
+import { RootStackParams } from '../../../navigation/Customer/ServiceStackNavigator';
+
+type ServiceScreenNavigationProp = StackNavigationProp<RootStackParams, 'DirectionScreen'>
+
 const DirectionScreen = () => {
+
+  const navigation = useNavigation<ServiceScreenNavigationProp>();
 
   const { state, getAddresses } = useContext(AddressContext)
 
@@ -97,7 +104,9 @@ const DirectionScreen = () => {
 
       <PrincipalButton
         label="Siguiente"
-        onPress={() => null}
+        onPress={() => {
+          navigation.navigate('OrderScreen')
+        }}
       />
     </View>
   )

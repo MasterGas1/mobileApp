@@ -96,7 +96,6 @@ const checkToken = (dispatch: Dispatch<AuthAction>) => async() => {
     const token = await AsyncStorage.getItem('token')
     const role = await AsyncStorage.getItem('role')
 
-    console.log(role)
     if(token && role) {
         dispatch({type: 'signup', payload: {name: '', lastName: '', token: token, role: role}})
     }
