@@ -10,12 +10,13 @@ import { globalColors } from '../../styles/globalVariables';
 
 import { SubServiceScreenInterface } from '../../interface/subServiceScreenInterface';
 import OrderScreen from '../../screens/Customer/Service/OrderScreen';
+import { ResponseCreateRequestInterface } from '../../interface/requestInterface';
 
 export type RootStackParams = {
     ServiceScreen: undefined,
     SubServiceScreen: SubServiceScreenInterface,
-    DirectionScreen: undefined,
-    OrderScreen: undefined
+    DirectionScreen: {serviceId: string},
+    OrderScreen: {request: ResponseCreateRequestInterface},
 }
 
 const Stack = createStackNavigator<RootStackParams>();

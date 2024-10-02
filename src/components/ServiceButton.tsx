@@ -29,7 +29,7 @@ const ServiceButton = ({name, description, image, id, price, type}: ServiceButto
             if (type === 'root service' || type === 'subservice') {
                 navigation.push('SubServiceScreen',{name, id, description, price})
             } else {
-                navigation.navigate('DirectionScreen')
+                navigation.navigate('DirectionScreen', {serviceId: id})
             }
         }}
     >

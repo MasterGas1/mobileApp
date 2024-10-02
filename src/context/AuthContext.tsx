@@ -5,19 +5,21 @@ import dbApi from "../api/DbApi";
 
 import dataContext from "./dataContext";
 
-import { UserRequestInterface } from '../interface/signupInterface';
-import { UserResponseInterface } from "../interface/userInterface";
+import {UserRequestInterface } from '../interface/signupInterface';
+import { CustomerByTokenInterface, UserResponseLoginInterface, UserResponseTokenInterface } from "../interface/userInterface";
 import { LoginInterface } from "../interface/loginInterface";
 
 export interface AuthState {
     token: string | null;
     role: string | null;
+    user: CustomerByTokenInterface;
     errorMessage: string;
 }
 
 export type AuthAction = 
     | {type: 'signup', payload: {name: string, lastName: string, token: string, role: string}}
     | {type: 'logout', payload: {}}
+    | {type: 'checkToken', payload: {id: string, name: string, lastName: string, token: string, role: string}}
     | {type: 'errorMessage', payload: {errorMessage: string}}
 
 
@@ -34,15 +36,28 @@ const authReducer = (prevState: AuthState, action: AuthAction): AuthState => {
     switch (action.type) {
         case 'signup':
             return {
+                ...prevState,
                 token: action.payload.token,
                 role: action.payload.role,
                 errorMessage: ''
             }
         case 'logout':
             return {
+                ...prevState,
                 token: null,
                 role: null,
                 errorMessage: ''
+            }
+        case 'checkToken':
+            return {
+                ...prevState,
+                user: {
+                    name: action.payload.name,
+                    lastName: action.payload.lastName,
+                    _id: action.payload.id
+                },
+                token: action.payload.token,
+                role: action.payload.role
             }
         case 'errorMessage':
             return {
@@ -57,7 +72,7 @@ const authReducer = (prevState: AuthState, action: AuthAction): AuthState => {
 const signup = (dispatch: Dispatch<AuthAction>) => async(body: UserRequestInterface) => {
     try {
 
-        const {data} = await dbApi.post<UserResponseInterface>('/customer', body)
+        const {data} = await dbApi.post<UserResponseLoginInterface>('/customer', body)
         dispatch({type: 'signup', payload: {name: data.name, lastName: data.lastName, token: data.token, role: data.role}})
 
         await AsyncStorage.setItem('token', data.token);
@@ -71,7 +86,7 @@ const signup = (dispatch: Dispatch<AuthAction>) => async(body: UserRequestInterf
 
 const signin = (dispatch: Dispatch<AuthAction>) => async(body: LoginInterface) => {
     try {
-        const {data} = await dbApi.post<UserResponseInterface>('/auth', body)
+        const {data} = await dbApi.post<UserResponseLoginInterface>('/auth', body)
         dispatch({type: 'signup', payload: {name: data.name, lastName: data.lastName, token: data.token, role: data.role}})
         await AsyncStorage.setItem('token', data.token);
         await AsyncStorage.setItem('role', data.role);
@@ -95,9 +110,17 @@ const checkToken = (dispatch: Dispatch<AuthAction>) => async() => {
 
     const token = await AsyncStorage.getItem('token')
     const role = await AsyncStorage.getItem('role')
-
+    
     if(token && role) {
-        dispatch({type: 'signup', payload: {name: '', lastName: '', token: token, role: role}})
+
+        try {
+            const {data} = await dbApi.get<UserResponseTokenInterface>('/user')
+    
+            dispatch({type: 'checkToken', payload: {id: data._id, name: data.name, lastName: data.lastName, token: token, role: role}})
+            
+        } catch(error) {
+            console.log(error)
+        }
     }
 }
 
@@ -110,6 +133,12 @@ export const {Provider, Context} = dataContext<AuthContextProps>(authReducer,
     }, 
     {
         token: null,
+        user: {
+            name: '',
+            lastName: '',
+            _id: '',
+        },
         errorMessage: '',
-        role: null
+        role: null,
+
     })

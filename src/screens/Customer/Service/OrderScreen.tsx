@@ -2,13 +2,23 @@ import React, { useEffect } from 'react'
 import { Dimensions, StyleSheet, Text, View } from 'react-native'
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import MapView from 'react-native-maps';
+import { StackScreenProps } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import { globalColors } from '../../../styles/globalVariables';
+
 import Spacer from '../../../components/common/Spacer';
 
 
-const OrderScreen = () => {
+import { RootStackParams } from '../../../navigation/Customer/ServiceStackNavigator';
+
+type Props = StackScreenProps<RootStackParams, 'OrderScreen'>
+
+const OrderScreen = ({route}: Props) => {
+
+    const {request} = route.params;
+
+    const {serviceId, installerId} = request;
 
     const navigation = useNavigation();
 
@@ -41,22 +51,22 @@ const OrderScreen = () => {
             style={styles.installerInfoContainer}
         >
             <Text style={styles.textInstallerWaiting}>Esperando respuesta</Text>
-            <View style={{marginTop: 10, marginBottom: 5, flexDirection: 'row'}}>
-                <Text style={styles.installerText}>Manuel Barba</Text>
-                <View style={{flexDirection: 'row', marginLeft: 10}}>
+            <View style={{marginTop: 10, marginBottom: 5, flexDirection: 'column'}}>
+                <Text style={styles.installerText}>{installerId.name} {installerId.lastName}</Text>
+                <View style={{flexDirection: 'row'}}>
                     <Icon name="star" size={20} color={globalColors.principalColor} />
-                    <Text style={styles.installerText}>4.50</Text>
+                    <Text style={styles.installerText}>{installerId.score}</Text>
                 </View>
             </View>
-            <Text style={styles.installerText}>Calle #10</Text>
+            
         </View>
 
         <View style={styles.serviceContainerInfo}>
             <Text style={styles.textInstallerWaiting}>Detalles del servicio</Text>
             <Spacer height={10} />
-            <Text style={styles.installerText}>Nombre del servicio</Text>
+            <Text style={styles.installerText}>{serviceId.name}</Text>
             <Spacer height={5} />
-            <Text style={styles.installerText}>Precio: $100</Text>
+            <Text style={styles.installerText}>${serviceId.price}</Text>
         </View>
     </View>
   )

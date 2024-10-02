@@ -1,3 +1,4 @@
+import { useContext, useEffect, useRef } from 'react';
 import { Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -9,9 +10,22 @@ import ProfileStackNavigator from './ProfileStackNavigator';
 
 import { globalColors } from '../../styles/globalVariables';
 
+import { Context as SocketContext } from '../../context/SocketContext';
+
 const Tab = createBottomTabNavigator();
 
 const CustomerNavigator = () => {
+
+    const mounted = useRef(false);
+
+    const { connect } = useContext(SocketContext);
+
+    useEffect(() => {
+        if (!mounted.current) {
+            connect();
+            mounted.current = true;
+        }
+    },[])
 
     return (
         <Tab.Navigator

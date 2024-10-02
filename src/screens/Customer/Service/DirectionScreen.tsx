@@ -2,8 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import Icon from 'react-native-vector-icons/Ionicons';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useNavigation } from '@react-navigation/native';
+import {StackScreenProps } from '@react-navigation/stack';
 
 import { globalColors } from '../../../styles/globalVariables'
 
@@ -12,16 +11,22 @@ import PrincipalButton from '../../../components/common/PrincipalButton';
 import ModalAddress from '../../../components/ModalAddress';
 import AddressButton from '../../../components/AddressButton';
 
-import { Context as AddressContext, getAddresses } from '../../../context/AddressContext';
+import { Context as AddressContext } from '../../../context/AddressContext';
+import { Context as SocketContext } from '../../../context/SocketContext';
+import { Context as AuthContext } from '../../../context/AuthContext';
+
 import { RootStackParams } from '../../../navigation/Customer/ServiceStackNavigator';
+import { ResponseCreateRequestInterface } from '../../../interface/requestInterface';
 
-type ServiceScreenNavigationProp = StackNavigationProp<RootStackParams, 'DirectionScreen'>
+type Props = StackScreenProps<RootStackParams, 'DirectionScreen'>
 
-const DirectionScreen = () => {
+const DirectionScreen = ({route, navigation}: Props) => {
 
-  const navigation = useNavigation<ServiceScreenNavigationProp>();
+  const { serviceId } = route.params
 
   const { state, getAddresses } = useContext(AddressContext)
+  const { state: { socket }} = useContext(SocketContext)
+  const { state: { user }} = useContext(AuthContext)
 
   const { getCurrentLocation, setNewLocation, location, address } = useLocation();
 
@@ -35,6 +40,13 @@ const DirectionScreen = () => {
   useEffect(() => {
     setIsOpen(false)
   },[state.addresses])
+
+  useEffect(() => {
+    socket?.on('responseRequest-'+user._id, (data: ResponseCreateRequestInterface) => {
+      navigation.navigate('OrderScreen', {request: data})
+    })
+  },[socket])
+  
 
   return (
     <View
@@ -97,7 +109,7 @@ const DirectionScreen = () => {
               name={item.name}
               addressName={item.addressName}
               key={item._id}
-              onPress={() => setNewLocation(item.coords.latitude, item.coords.longitude)}
+              onPress={() => setNewLocation(item.coordinates.latitude, item.coordinates.longitude)}
             />
           )}
         />
@@ -105,7 +117,16 @@ const DirectionScreen = () => {
       <PrincipalButton
         label="Siguiente"
         onPress={() => {
-          navigation.navigate('OrderScreen')
+          socket?.emit('createRequest',
+          {
+            customerId: user?._id,
+            addressName: address,
+            serviceId: serviceId,
+            coordinates: {
+              latitude: location.latitude, 
+              longitude: location.longitude
+            }
+          })
         }}
       />
     </View>

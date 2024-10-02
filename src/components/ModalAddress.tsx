@@ -24,7 +24,7 @@ const ModalAddress = ({isOpen, setIsOpen}: ModalAddressProps) => {
     const {name, addressName, form, onChange} = useForm({
         name: '',
         addressName: '',
-        coords: {
+        coordinates: {
             latitude: 0,
             longitude: 0
         }
@@ -44,9 +44,9 @@ const ModalAddress = ({isOpen, setIsOpen}: ModalAddressProps) => {
             onChange({
                 latitude: ref.current.latitude,
                 longitude: ref.current.longitude
-            },'coords')
+            },'coordinates')
         } else {
-            onChange({latitude: 0, longitude: 0},'coords')
+            onChange({latitude: 0, longitude: 0},'coordinates')
         }
     },[addressName])
 
