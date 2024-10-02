@@ -1,3 +1,5 @@
+import { useContext, useEffect, useRef } from 'react';
+
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 import { Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -8,9 +10,46 @@ import RequestStackNavigator from './RequestsStackNavigator';
 import RecordStackNavigator from './RecordStackNavigator';
 import ProfileStackNavigator from './ProfileStackNavigator';
 
+import { Context as SocketContext } from '../../context/SocketContext';
+import { PermissionContext } from '../../context/PermissionsContext';
+
 const Tab = createBottomTabNavigator();
 
 const InstallerNavigator = () => {
+
+    const mounted = useRef(false);
+
+    const {state: {socket}, connect } = useContext(SocketContext);
+    const {askLocationPermission} = useContext(PermissionContext)
+
+    useEffect(() => {
+        if (!mounted.current) {
+            connect();
+            askLocationPermission();
+            mounted.current = true;
+        }
+    },[])
+
+    useEffect(() => {
+        // const intervalId = setInterval(() => {
+        //     Geolocation.getCurrentPosition(async ({coords}) => {
+        //         const {latitude, longitude} = coords
+
+        //         if (socket) {
+        //             socket.emit('updateInstallerCoordinates', {
+        //                 token,
+        //                 latitude, 
+        //                 longitude
+        //             })
+        //         }
+        //     })
+        // }, 5000)
+
+        // return () => {
+        //     clearInterval(intervalId)
+        // }
+    },[socket])
+
     return (
         <Tab.Navigator
             screenOptions={{

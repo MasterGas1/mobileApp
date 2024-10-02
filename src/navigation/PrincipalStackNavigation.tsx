@@ -1,3 +1,4 @@
+import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import LoginScreen from '../screens/LoginScreen';
@@ -37,11 +38,11 @@ const PrincipalStackNavigation = () => {
     >
       {
         state.token === null && state.role === null
-         ? <>
+         ? <React.Fragment>
             <Stack.Screen name="LoginScreen" component={LoginScreen} options={{headerShown: false}} />
             <Stack.Screen name='SignupScreen' component={SignupScreen} />
             <Stack.Screen name='FiscalScreen' component={FiscalScreen} />
-           </>
+           </React.Fragment>
          :  state.role === 'Customer' 
               ? <Stack.Screen name="CustomerNavigator" component={CustomerNavigator} />
               : <Stack.Screen name="InstallerNavigator" component={InstallerNavigator} />

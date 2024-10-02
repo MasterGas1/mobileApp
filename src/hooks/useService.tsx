@@ -23,7 +23,6 @@ export const useService = () => {
         try {
             setIsLoading(true);
             const {data} = await dbApi.get<ServiceInterface>(`/service/${id}`);
-            console.log(data)
             setServices(data.subservicesId)
             setIsLoading(false)
         } catch(error) {

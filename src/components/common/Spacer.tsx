@@ -1,9 +1,13 @@
 import React from 'react'
 import { View } from 'react-native'
 
-const Spacer = () => {
+interface Props {
+  height?: number
+}
+
+const Spacer = ({height = 20}: Props) => {
   return (
-    <View style={{height: 20}}/>
+    <View style={{height}}/>
   )
 }
 

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
-    "ios": "react-native run-ios",
+    "ios": "npx react-native run-ios --simulator=\"iPhone X\"",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest"
@@ -27,7 +27,8 @@
     "react-native-safe-area-context": "^3.4.1",
     "react-native-screens": "^3.29.0",
     "react-native-svg": "^12.1.1",
-    "react-native-vector-icons": "^10.1.0"
+    "react-native-vector-icons": "^10.1.0",
+    "socket.io-client": "^4.8.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
