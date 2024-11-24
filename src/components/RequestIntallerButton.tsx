@@ -7,12 +7,14 @@ interface RequestIntallerButtonInterface {
     name: string
     service: string
     srcImage: string
+    onPress: () => void
 }
 
-const RequestIntallerButton = ({name, service, srcImage}: RequestIntallerButtonInterface) => {
+const RequestIntallerButton = ({name, service, srcImage, onPress}: RequestIntallerButtonInterface) => {
   return (
     <TouchableOpacity
         style={styles.container}
+        onPress={onPress}
     >
         <View
             style={{

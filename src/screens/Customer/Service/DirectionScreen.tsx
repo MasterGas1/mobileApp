@@ -1,62 +1,68 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import MapView, { Marker } from 'react-native-maps'
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {useContext, useEffect, useState} from 'react';
+import {
+  Dimensions,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import MapView, {Marker} from 'react-native-maps';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {StackScreenProps } from '@react-navigation/stack';
+import {StackScreenProps} from '@react-navigation/stack';
 
-import { globalColors } from '../../../styles/globalVariables'
+import {globalColors} from '../../../styles/globalVariables';
 
-import { useLocation } from '../../../hooks/useLocation';
+import {useLocation} from '../../../hooks/useLocation';
 import PrincipalButton from '../../../components/common/PrincipalButton';
 import ModalAddress from '../../../components/ModalAddress';
 import AddressButton from '../../../components/AddressButton';
 
-import { Context as AddressContext } from '../../../context/AddressContext';
-import { Context as SocketContext } from '../../../context/SocketContext';
-import { Context as AuthContext } from '../../../context/AuthContext';
+import {Context as AddressContext} from '../../../context/AddressContext';
+import {Context as SocketContext} from '../../../context/SocketContext';
+import {Context as AuthContext} from '../../../context/AuthContext';
 
-import { RootStackParams } from '../../../navigation/Customer/ServiceStackNavigator';
-import { ResponseCreateRequestInterface } from '../../../interface/requestInterface';
+import {RootStackParams} from '../../../navigation/Customer/ServiceStackNavigator';
+import {ResponseCreateRequestInterface} from '../../../interface/requestInterface';
 
-type Props = StackScreenProps<RootStackParams, 'DirectionScreen'>
+type Props = StackScreenProps<RootStackParams, 'DirectionScreen'>;
 
 const DirectionScreen = ({route, navigation}: Props) => {
+  const {serviceId} = route.params;
 
-  const { serviceId } = route.params
+  const {state, getAddresses} = useContext(AddressContext);
+  const {
+    state: {socket},
+  } = useContext(SocketContext);
+  const {
+    state: {user},
+  } = useContext(AuthContext);
 
-  const { state, getAddresses } = useContext(AddressContext)
-  const { state: { socket }} = useContext(SocketContext)
-  const { state: { user }} = useContext(AuthContext)
+  const {getCurrentLocation, setNewLocation, location, address} = useLocation();
 
-  const { getCurrentLocation, setNewLocation, location, address } = useLocation();
-
-  const [isOpen, setIsOpen] = useState(false)
-
-  useEffect(() => {
-    getCurrentLocation()
-    getAddresses()
-  },[])
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    setIsOpen(false)
-  },[state.addresses])
+    getCurrentLocation();
+    getAddresses();
+  }, []);
 
   useEffect(() => {
-    socket?.on('responseRequest-'+user._id, (data: ResponseCreateRequestInterface) => {
-      navigation.navigate('OrderScreen', {request: data})
-    })
-  },[socket])
-  
+    setIsOpen(false);
+  }, [state.addresses]);
+
+  useEffect(() => {
+    if (socket && socket.socket?.id) {
+      socket.on(socket.socket.id, (data: ResponseCreateRequestInterface) => {
+        navigation.navigate('OrderScreen', {request: data});
+      });
+    }
+  }, [socket]);
 
   return (
-    <View
-      style={styles.container}
-    >
-
-      <ModalAddress
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-      />
+    <View style={styles.container}>
+      <ModalAddress isOpen={isOpen} setIsOpen={setIsOpen} />
 
       <MapView
         initialRegion={{
@@ -72,79 +78,77 @@ const DirectionScreen = ({route, navigation}: Props) => {
           longitudeDelta: 0.004,
         }}
         style={styles.map}
-        scrollEnabled={false}
-      >
+        scrollEnabled={false}>
         <Marker
           coordinate={{
             latitude: location.latitude,
-            longitude: location.longitude
+            longitude: location.longitude,
           }}
         />
       </MapView>
       <View style={styles.containerInfo}>
-        <View style={{width: "70%"}}>
+        <View style={{width: '70%'}}>
           <Text style={styles.textTitleDirection}>Ubicación actual</Text>
           <Text style={styles.textAddress}>{address}</Text>
         </View>
 
         <TouchableOpacity
           style={styles.buttonAdd}
-          onPress={() => setIsOpen(true)}
-        >
-          <Icon
-            name='add'
-            size={30}
-            color='white'
-          />
+          onPress={() => setIsOpen(true)}>
+          <Icon name="add" size={30} color="white" />
         </TouchableOpacity>
       </View>
 
       <Text style={styles.textTitleList}>Direcciones guardas</Text>
       <FlatList
-          data={state.addresses}
-          keyExtractor={(item) => item._id}
-          style={styles.containerList}
-          renderItem={({ item }) => (
-            <AddressButton
-              name={item.name}
-              addressName={item.addressName}
-              key={item._id}
-              onPress={() => setNewLocation(item.coordinates.latitude, item.coordinates.longitude)}
-            />
-          )}
-        />
+        data={state.addresses}
+        keyExtractor={item => item._id}
+        style={styles.containerList}
+        renderItem={({item}) => (
+          <AddressButton
+            name={item.name}
+            addressName={item.addressName}
+            key={item._id}
+            onPress={() =>
+              setNewLocation(
+                item.coordinates.latitude,
+                item.coordinates.longitude,
+              )
+            }
+          />
+        )}
+      />
 
       <PrincipalButton
         label="Siguiente"
         onPress={() => {
-          socket?.emit('createRequest',
-          {
+          socket?.emit('create-request', {
             customerId: user?._id,
             addressName: address,
             serviceId: serviceId,
             coordinates: {
-              latitude: location.latitude, 
-              longitude: location.longitude
-            }
-          })
+              latitude: location.latitude,
+              longitude: location.longitude,
+            },
+          });
         }}
       />
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    padding: 20
+    padding: 20,
   },
   map: {
-    width: "100%",
-    height: "40%"
+    width: '100%',
+    height: '40%',
   },
   containerInfo: {
-    width: "100%",
+    width: '100%',
     marginTop: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -157,7 +161,7 @@ const styles = StyleSheet.create({
   textAddress: {
     fontSize: Dimensions.get('window').width * 0.038,
     fontWeight: '700',
-    width: "100%",
+    width: '100%',
     color: globalColors.secondaryColor,
   },
   buttonAdd: {
@@ -167,7 +171,7 @@ const styles = StyleSheet.create({
     height: 50,
     padding: 10,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   textTitleList: {
     fontSize: Dimensions.get('window').width * 0.04,
@@ -175,12 +179,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontWeight: 'bold',
     color: 'black',
-    width: "100%",
-    marginBottom: 10
+    width: '100%',
+    marginBottom: 10,
   },
   containerList: {
-    width: "100%"
-  }
-})
+    width: '100%',
+  },
+});
 
-export default DirectionScreen
+export default DirectionScreen;
