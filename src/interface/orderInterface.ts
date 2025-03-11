@@ -1,11 +1,15 @@
-export interface ResponseCreateRequestInterface {
+import {User} from './requestInterface';
+export interface OrderResponseInterface {
   serviceId: ServiceID;
-  installerId: User;
-  customerId: User;
+  installerId: UserID;
+  customerId: UserID;
+  price: number;
+  state: string;
   addressName: string;
   coordinates: Coordinates;
   _id: string;
   createdAt: Date;
+  __v: number;
 }
 
 export interface Coordinates {
@@ -14,17 +18,22 @@ export interface Coordinates {
   _id: string;
 }
 
-export interface User {
+export interface UserID {
   score: number;
   _id: string;
   name: string;
   lastName: string;
   picture: string;
+  installerId?: InstallerID;
+}
+
+export interface InstallerID {
+  _id: string;
+  phoneNumber: string;
 }
 
 export interface ServiceID {
   _id: string;
   name: string;
-  description: string;
   price: number;
 }
