@@ -13,6 +13,8 @@ import ProfileStackNavigator from './ProfileStackNavigator';
 
 import {Context as SocketContext} from '../../context/SocketContext';
 import {Context as AuthContext} from '../../context/AuthContext';
+import {Context as PositionContext} from '../../context/PositionContext';
+import {Context as OrderContext} from '../../context/OrderContext';
 
 const Tab = createBottomTabNavigator();
 
@@ -27,6 +29,10 @@ const InstallerNavigator = () => {
     state: {user},
   } = useContext(AuthContext);
 
+  const {getPosition} = useContext(PositionContext);
+
+  const {getOrder} = useContext(OrderContext);
+
   useEffect(() => {
     const watchId = Geolocation.watchPosition(
       ({coords}) => {
@@ -38,15 +44,22 @@ const InstallerNavigator = () => {
             userId: user._id,
           });
         }
+        getPosition(latitude, longitude);
       },
       error => console.log(error),
       {
         enableHighAccuracy: true,
+        distanceFilter: 0,
+        interval: 20000, // 20 seconds interval
       },
     );
 
     return () => Geolocation.clearWatch(watchId);
   }, [socket]);
+
+  useEffect(() => {
+    getOrder();
+  }, []);
 
   return (
     <Tab.Navigator

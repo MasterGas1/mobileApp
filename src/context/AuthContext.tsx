@@ -148,7 +148,6 @@ const clearErrorMessage = (dispatch: Dispatch<AuthAction>) => () => {
 const checkToken = (dispatch: Dispatch<AuthAction>) => async () => {
   const token = await AsyncStorage.getItem('token');
   const role = await AsyncStorage.getItem('role');
-
   if (token && role) {
     try {
       const {data} = await dbApi.get<UserResponseTokenInterface>('/user');
