@@ -1,6 +1,11 @@
 import React from 'react';
-import {StyleProp, StyleSheet, TouchableOpacity, ViewStyle} from 'react-native';
-import {Text} from 'react-native-paper';
+import {
+  StyleProp,
+  StyleSheet,
+  TouchableOpacity,
+  ViewStyle,
+  Text,
+} from 'react-native';
 
 import {globalColors} from '../../styles/globalVariables';
 

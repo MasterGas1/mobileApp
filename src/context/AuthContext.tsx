@@ -1,5 +1,6 @@
 import {Dispatch} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 import dbApi from '../api/DbApi';
 
@@ -12,12 +13,16 @@ import {
   UserResponseTokenInterface,
 } from '../interface/userInterface';
 import {LoginInterface} from '../interface/loginInterface';
+import {ErrorResponseInterface} from '../interface/errorResponse';
 
 export interface AuthState {
   token: string | null;
   role: string | null;
   user: CustomerByTokenInterface;
-  errorMessage: string;
+  errorMessage: {
+    message: string;
+    screen: 'signin' | 'signup';
+  } | null;
 }
 
 export type AuthAction =
@@ -36,7 +41,14 @@ export type AuthAction =
         role: string;
       };
     }
-  | {type: 'errorMessage'; payload: {errorMessage: string}};
+  | {
+      type: 'errorMessage';
+      payload: {errorMessage: string; screen: 'signin' | 'signup'};
+    }
+  | {
+      type: 'clearErrorMessage';
+      payload: {};
+    };
 
 type AuthContextProps = {
   state: AuthState;
@@ -53,14 +65,14 @@ const authReducer = (prevState: AuthState, action: AuthAction): AuthState => {
         ...prevState,
         token: action.payload.token,
         role: action.payload.role,
-        errorMessage: '',
+        errorMessage: null,
       };
     case 'logout':
       return {
         ...prevState,
         token: null,
         role: null,
-        errorMessage: '',
+        errorMessage: null,
       };
     case 'checkToken':
       return {
@@ -76,7 +88,15 @@ const authReducer = (prevState: AuthState, action: AuthAction): AuthState => {
     case 'errorMessage':
       return {
         ...prevState,
-        errorMessage: action.payload.errorMessage.split(':')[1],
+        errorMessage: {
+          message: action.payload.errorMessage,
+          screen: action.payload.screen,
+        },
+      };
+    case 'clearErrorMessage':
+      return {
+        ...prevState,
+        errorMessage: null,
       };
     default:
       return prevState;
@@ -102,12 +122,17 @@ const signup =
 
       await AsyncStorage.setItem('token', data.token);
       await AsyncStorage.setItem('role', data.role);
-    } catch (error: any) {
-      if (error.response.data) {
+    } catch (error) {
+      if (axios.isAxiosError<ErrorResponseInterface>(error)) {
         dispatch({
           type: 'errorMessage',
-          payload: {errorMessage: error.response.data.message},
+          payload: {
+            errorMessage: error.response?.data.message as string,
+            screen: 'signup',
+          },
         });
+      } else {
+        console.log(error);
       }
     }
   };
@@ -130,7 +155,16 @@ const signin =
       });
       await AsyncStorage.setItem('token', data.token);
       await AsyncStorage.setItem('role', data.role);
-    } catch (error: any) {
+    } catch (error) {
+      if (axios.isAxiosError<ErrorResponseInterface>(error)) {
+        dispatch({
+          type: 'errorMessage',
+          payload: {
+            errorMessage: error.response?.data.message as string,
+            screen: 'signin',
+          },
+        });
+      }
       console.log(error);
     }
   };
@@ -142,7 +176,7 @@ const signout = (dispatch: Dispatch<AuthAction>) => async () => {
 };
 
 const clearErrorMessage = (dispatch: Dispatch<AuthAction>) => () => {
-  dispatch({type: 'errorMessage', payload: {errorMessage: ''}});
+  dispatch({type: 'clearErrorMessage', payload: {}});
 };
 
 const checkToken = (dispatch: Dispatch<AuthAction>) => async () => {
@@ -178,7 +212,7 @@ export const {Provider, Context} = dataContext<AuthContextProps>(
       lastName: '',
       _id: '',
     },
-    errorMessage: '',
+    errorMessage: null,
     role: null,
   },
 );

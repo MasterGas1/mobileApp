@@ -1,171 +1,191 @@
-import { useContext } from 'react';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useNavigation } from '@react-navigation/native';
-import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {useContext, useEffect} from 'react';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {useNavigation} from '@react-navigation/native';
+import {
+  Alert,
+  Dimensions,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
-import { RootStackParams } from '../navigation/PrincipalStackNavigation';
+import {RootStackParams} from '../navigation/PrincipalStackNavigation';
 
-import InputLogin from '../components/InputLogin'
 import Spacer from '../components/common/Spacer';
-
-import { globalColors } from '../styles/globalVariables'
-
-import { useForm } from '../hooks/useForm';
-import { useLogin } from '../hooks/useLogin';
-
-import { Context as AuthContext} from '../context/AuthContext'
+import {TextInput} from '../components/common/index';
 import ErrorAlert from '../components/common/ErrorAlert';
 
-type LoginScreenNavigationProp = StackNavigationProp<RootStackParams, 'LoginScreen'>
+import {globalColors} from '../styles/globalVariables';
+
+import {useForm} from '../hooks/useForm';
+import {useLogin} from '../hooks/useLogin';
+
+import {Context as AuthContext} from '../context/AuthContext';
+import {relativeFontSize} from '../helper/relativeFontSize';
+
+type LoginScreenNavigationProp = StackNavigationProp<
+  RootStackParams,
+  'LoginScreen'
+>;
+
+const {height} = Dimensions.get('window');
 
 const LoginScreen = () => {
+  const navigation = useNavigation<LoginScreenNavigationProp>();
 
-  const navigation = useNavigation<LoginScreenNavigationProp>()
+  const {
+    state: {errorMessage},
+    signin,
+    clearErrorMessage,
+  } = useContext(AuthContext);
 
-  const {state, signin} = useContext(AuthContext)
-
-  const {email, password, form, onChange} = useForm({
-    email: '',
-    password: '',
-  })
-
-  const {errorEmail, errorPassword, isValid ,validateInput} = useLogin({email,password});
-
-  const onSubmit = () => {
-    validateInput();
-    if (isValid.current) {
-      signin(form)
+  useEffect(() => {
+    if (errorMessage && errorMessage.screen === 'signin') {
+      Alert.alert('Error', errorMessage.message);
+      clearErrorMessage();
     }
-  }
+  }, [errorMessage]);
+
+  const {email, password, errors, touched, onChange, handleSubmit} = useForm(
+    {
+      email: '',
+      password: '',
+    },
+    {
+      email: {
+        errorMessage: 'El correo debe ser valido',
+        regexValidation:
+          /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+      },
+      password: {
+        errorMessage: 'La contraseña debe ser igual o mayor a 8 caracteres',
+        regexValidation: /^(.{8,})$/,
+      },
+    },
+    signin,
+  );
 
   return (
-    <View style={styles.container}>
-        <View style={styles.containerLogo}>
-            <Image
-              source={require('../../assets/Logo.png')}
-              style={styles.imageLogo}
-            />
-            <Text style={styles.textCompany}>MasterGas23</Text>
-        </View>
-        <View style={styles.formContainer}>
-            <Text style={styles.titleForm}>Iniciar Sesion</Text>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <View style={styles.containerLogo}>
+        <Image
+          source={require('../../assets/Logo.png')}
+          style={styles.imageLogo}
+        />
+        <Text style={styles.textCompany}>MasterGas23</Text>
+      </View>
+      <View style={styles.formContainer}>
+        <Text style={styles.titleForm}>Iniciar Sesion</Text>
 
-            <Spacer/>
-            <InputLogin 
-              label="Correo electrónico"
-              name='email'
-              text={email}
-              onChangeText={onChange}
-              autoCapitalize='none'
-              isThereError={errorEmail}
-            />
-            <Spacer/>
-            <InputLogin 
-              label="Contraseña"
-              name='password'
-              secureTextEntry
-              text={password}
-              onChangeText={onChange}
-              autoCapitalize='none'
-              isThereError={errorPassword}
-            />
+        <Spacer />
+        <TextInput
+          label="Correo Electronico"
+          value={email}
+          onChangeText={value => {
+            onChange(value, 'email');
+          }}
+          errorMessage={errors.email}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          touched={touched['email']}
+        />
 
-            {
-                state.errorMessage 
-                ? <View style={{width: '80%', marginTop: 10}}>
-                    <ErrorAlert
-                        errorMessage={state.errorMessage}
-                    />
-                  </View> 
-                : null
-            }
+        <Spacer />
+        <TextInput
+          label="Contraseña"
+          value={password}
+          onChangeText={value => {
+            onChange(value, 'password');
+          }}
+          secureTextEntry
+          errorMessage={errors.password}
+          touched={touched['password']}
+        />
 
-            <TouchableOpacity
-              style={{...styles.button, marginTop: state.errorMessage ? 10 : '5%'}}
-              onPress={onSubmit}
-            >
-              <Text style={styles.textButton}>INICIAR SESIÓN</Text>
-            </TouchableOpacity>
+        <TouchableOpacity style={{...styles.button}} onPress={handleSubmit}>
+          <Text style={styles.textButton}>INICIAR SESIÓN</Text>
+        </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.buttonSignUp}
-              onPress={() => navigation.navigate('SignupScreen')}
-            >
-                <Text
-                  style={styles.textButtonSignUp}
-                >
-                  REGISTRAR
-                </Text>
-            </TouchableOpacity>
-            <Spacer/>
+        <TouchableOpacity
+          style={styles.buttonSignUp}
+          onPress={() => navigation.navigate('SignupScreen')}>
+          <Text style={styles.textButtonSignUp}>REGISTRAR</Text>
+        </TouchableOpacity>
+        <Spacer />
 
-            <TouchableOpacity
-              style={styles.restorePasswordButton}
-            >
-              <Text style={styles.retorePasswordButtonText}>
-                Recuperar contraseña
-              </Text>
-            </TouchableOpacity>
-        </View>
-    </View>
-  )
-}
+        <TouchableOpacity style={styles.restorePasswordButton}>
+          <Text style={styles.retorePasswordButtonText}>
+            Recuperar contraseña
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    paddingTop: height * 0.06,
   },
   containerLogo: {
-    flex:1,
+    flex: 1,
     padding: 10,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   imageLogo: {
-    width: "45%",
-    resizeMode: "stretch",
-    height: "70%"
+    width: '100%',
+    resizeMode: 'contain',
+    height: '60%',
   },
   textCompany: {
     marginTop: 15,
-    fontSize: 25,
+    fontSize: relativeFontSize(24),
     fontWeight: 'bold',
-    color: globalColors.principalColor
+    color: globalColors.principalColor,
   },
   formContainer: {
-    flex:2,
+    flex: 2,
     alignItems: 'center',
     backgroundColor: globalColors.principalColor,
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     paddingTop: 40,
+    paddingHorizontal: 20,
   },
   titleForm: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 30,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   button: {
     width: '80%',
-    marginTop: "5%",
+    marginTop: '5%',
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 5,
-    backgroundColor: globalColors.thirdColor
+    backgroundColor: globalColors.thirdColor,
   },
   textButton: {
     fontSize: Dimensions.get('window').width * 0.04,
     color: globalColors.principalColor,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   buttonSignUp: {
-    marginTop: "5%",
+    marginTop: '5%',
   },
   textButtonSignUp: {
     fontSize: Dimensions.get('window').width * 0.06,
-    color: globalColors.thirdColor
+    color: globalColors.thirdColor,
   },
   restorePasswordButton: {
     borderBottomWidth: 2,
@@ -173,8 +193,8 @@ const styles = StyleSheet.create({
   },
   retorePasswordButtonText: {
     color: 'white',
-    fontSize: Dimensions.get('window').width * 0.04
-  }
-})
+    fontSize: Dimensions.get('window').width * 0.04,
+  },
+});
 
-export default LoginScreen
+export default LoginScreen;
