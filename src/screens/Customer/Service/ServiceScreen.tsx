@@ -9,7 +9,6 @@ import {
   Linking,
   FlatList,
 } from 'react-native';
-import {ActivityIndicator} from 'react-native-paper';
 
 import Spacer from '../../../components/common/Spacer';
 import ServiceButton from '../../../components/ServiceButton';
@@ -42,7 +41,7 @@ const ServiceScreen = () => {
 
       <Spacer />
       {isLoading ? (
-        <ActivityIndicator size={'large'} color={globalColors.principalColor} />
+        <Text>Loading...</Text>
       ) : (
         <FlatList
           style={styles.containerList}
