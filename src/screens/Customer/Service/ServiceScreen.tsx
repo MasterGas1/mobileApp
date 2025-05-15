@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -8,18 +8,36 @@ import {
   Dimensions,
   Linking,
   FlatList,
+  RefreshControl,
 } from 'react-native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {useNavigation} from '@react-navigation/native';
 
 import Spacer from '../../../components/common/Spacer';
-import ServiceButton from '../../../components/ServiceButton';
+import ServiceButton from '../../../components/service/ServiceButton';
+import ServiceInformationModal from '../../../components/service/ServiceInformationModal';
 
 import {globalColors} from '../../../styles/globalVariables';
 
 import {useService} from '../../../hooks/useService';
-import {PermissionContext} from '../../../context/PermissionsContext';
+
+import {relativeFontSize} from '../../../helper/relativeFontSize';
+
+import {ServiceInterface} from '../../../interface/serviceInterface';
+
+import {RootStackParams} from '../../../navigation/Customer/ServiceStackNavigator';
+
+type ServiceScreenNavigationProp = StackNavigationProp<
+  RootStackParams,
+  'ServiceScreen'
+>;
 
 const ServiceScreen = () => {
   const {services, isLoading, getServices} = useService();
+  const [showInfoService, setShowInfoService] = useState(false);
+  const [selectedService, setSelectedService] = useState<ServiceInterface>();
+
+  const navigation = useNavigation<ServiceScreenNavigationProp>();
 
   useEffect(() => {
     getServices();
@@ -31,6 +49,17 @@ const ServiceScreen = () => {
 
   return (
     <View style={styles.container}>
+      <ServiceInformationModal
+        service={selectedService}
+        visible={showInfoService}
+        onChangeVisible={() => setShowInfoService(false)}
+        onHandleAccept={() => {
+          setShowInfoService(false);
+          navigation.navigate('DirectionScreen', {
+            serviceId: selectedService!._id,
+          });
+        }}
+      />
       <TouchableOpacity style={styles.containerAdd} onPress={handleClickAdd}>
         <Image
           source={require('../../../../assets/Logo.png')}
@@ -39,6 +68,8 @@ const ServiceScreen = () => {
         <Text style={styles.textCompany}>Visita nuestra página</Text>
       </TouchableOpacity>
 
+      <Text style={styles.textTitle}>Servicios</Text>
+
       <Spacer />
       {isLoading ? (
         <Text>Loading...</Text>
@@ -46,6 +77,9 @@ const ServiceScreen = () => {
         <FlatList
           style={styles.containerList}
           data={services}
+          refreshControl={
+            <RefreshControl refreshing={isLoading} onRefresh={getServices} />
+          }
           renderItem={({item}) => (
             <ServiceButton
               name={item.name}
@@ -54,6 +88,10 @@ const ServiceScreen = () => {
               id={item._id}
               price={item.price}
               type={item.type}
+              openModalServiceInformation={() => {
+                setSelectedService(item);
+                setShowInfoService(true);
+              }}
             />
           )}
           keyExtractor={item => item._id}
@@ -79,9 +117,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   imageLogo: {
-    width: '50%',
+    width: Dimensions.get('window').width * 0.35,
+    height: Dimensions.get('window').width * 0.35,
     resizeMode: 'stretch',
-    height: '100%',
   },
   textCompany: {
     color: 'white',
@@ -93,6 +131,14 @@ const styles = StyleSheet.create({
   containerList: {
     flex: 2,
     width: '100%',
+    marginTop: -10,
+  },
+  textTitle: {
+    marginTop: 35,
+    fontSize: relativeFontSize(24),
+    fontWeight: '500',
+    color: globalColors.principalColor,
+    alignSelf: 'flex-start',
   },
 });
 

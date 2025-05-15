@@ -282,8 +282,13 @@ PODS:
   - React-jsinspector (0.72.7)
   - React-logger (0.72.7):
     - glog
+  - react-native-blur (4.4.1):
+    - RCT-Folly (= 2021.07.22.00)
+    - React-Core
   - react-native-geolocation (3.2.1):
     - RCT-Folly (= 2021.07.22.00)
+    - React-Core
+  - react-native-image-picker (5.0.1):
     - React-Core
   - react-native-maps (1.14.0):
     - React-Core
@@ -436,7 +441,9 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
+  - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
   - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
+  - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-maps (from `../node_modules/react-native-maps`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
@@ -511,8 +518,12 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../node_modules/react-native/ReactCommon/logger"
+  react-native-blur:
+    :path: "../node_modules/@react-native-community/blur"
   react-native-geolocation:
     :path: "../node_modules/@react-native-community/geolocation"
+  react-native-image-picker:
+    :path: "../node_modules/react-native-image-picker"
   react-native-maps:
     :path: "../node_modules/react-native-maps"
   react-native-safe-area-context:
@@ -590,7 +601,9 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 10e6c77ff6b32274b8d152d08ed0328c4b30a821
   React-jsinspector: 8baadae51f01d867c3921213a25ab78ab4fbcd91
   React-logger: 8edc785c47c8686c7962199a307015e2ce9a0e4f
+  react-native-blur: 4c25fdccf6dc16b0935baa58d9d0fccb0683742b
   react-native-geolocation: 1279fd4390e311ec3f2fc2878279934147fdd061
+  react-native-image-picker: 8cb4280e2c1efc3daeb2d9d597f9429a60472e40
   react-native-maps: cbf2f03bfeebfd7ec45966b066db13a075fd2af3
   react-native-safe-area-context: 9e40fb181dac02619414ba1294d6c2a807056ab9
   React-NativeModulesApple: 6f63747fd6e237b646c61957a8f877a2713617af

@@ -1,25 +1,28 @@
 export interface UserInterface {
-    name:     string;
-    lastName: string;
-    email:    string;
-    password: string;
+  name: string;
+  lastName: string;
+  email: string;
+  password: string;
+  imageUri?: string;
 }
 
 export interface CustomerInterface {
-    rfc: string;
-    taxResidence: string;
+  rfc: string;
+  taxResidence: string;
 }
 
-export interface UserRequestInterface extends UserInterface, CustomerInterface {}
+export interface UserRequestInterface
+  extends UserInterface,
+    CustomerInterface {}
 
 export interface UserSignUpScreenInterface {
-   form : UserInterface
+  form: UserInterface;
 }
 
-export interface UserSignUpFormInterface { 
-    name: string;
-    lastName: string;
-    email: string;
-    password: string;
-    confirmPassword?: string;
+export interface UserSignUpFormInterface {
+  name: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword?: string;
 }

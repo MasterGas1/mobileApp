@@ -16,7 +16,7 @@ import {
 import {RootStackParams} from '../navigation/PrincipalStackNavigation';
 
 import Spacer from '../components/common/Spacer';
-import {TextInput} from '../components/common/index';
+import {Button, TextInput} from '../components/common/index';
 import ErrorAlert from '../components/common/ErrorAlert';
 
 import {globalColors} from '../styles/globalVariables';
@@ -38,7 +38,7 @@ const LoginScreen = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
 
   const {
-    state: {errorMessage},
+    state: {errorMessage, loading},
     signin,
     clearErrorMessage,
   } = useContext(AuthContext);
@@ -108,9 +108,13 @@ const LoginScreen = () => {
           touched={touched['password']}
         />
 
-        <TouchableOpacity style={{...styles.button}} onPress={handleSubmit}>
-          <Text style={styles.textButton}>INICIAR SESIÓN</Text>
-        </TouchableOpacity>
+        <Button
+          text="INICIAR SESION"
+          onPress={handleSubmit}
+          loading={loading}
+          styleContainer={styles.button}
+          styleText={styles.textButton}
+        />
 
         <TouchableOpacity
           style={styles.buttonSignUp}

@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   },
   outlinedContainer: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: globalColors.secondaryColor,
   },
   label: {
