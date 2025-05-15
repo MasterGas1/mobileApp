@@ -7,6 +7,7 @@ import {
   StyleProp,
   ViewStyle,
   TextStyle,
+  ActivityIndicator,
 } from 'react-native';
 import {globalColors} from '../../styles/globalVariables';
 import {relativeFontSize} from '../../helper/relativeFontSize';
@@ -15,6 +16,7 @@ interface ButtonProps extends ComponentProps<typeof TouchableOpacity> {
   text: string;
   styleContainer?: StyleProp<ViewStyle>;
   styleText?: StyleProp<TextStyle>;
+  loading?: boolean;
   onPress: () => void;
 }
 
@@ -24,13 +26,19 @@ const Button: FC<ButtonProps> = ({
   text,
   styleContainer,
   styleText,
+  loading,
   onPress,
 }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={[styles.container, styleContainer]}>
-      <Text style={[styles.text, styleText]}>{text}</Text>
+      style={[styles.container, styleContainer]}
+      disabled={loading}>
+      {loading ? (
+        <ActivityIndicator size={'small'} color={globalColors.principalColor} />
+      ) : (
+        <Text style={[styles.text, styleText]}>{text}</Text>
+      )}
     </TouchableOpacity>
   );
 };

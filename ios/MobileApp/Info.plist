@@ -64,5 +64,10 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>YOUR TEXT</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+		<string>Acceso a tu galeria</string>
+	<key>NSCameraUsageDescription</key>
+		<string>Acceso a tu cámara</string>
+
 </dict>
 </plist>

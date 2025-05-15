@@ -19,6 +19,7 @@ export interface AuthState {
   token: string | null;
   role: string | null;
   user: CustomerByTokenInterface;
+  loading: boolean;
   errorMessage: {
     message: string;
     screen: 'signin' | 'signup';
@@ -28,7 +29,14 @@ export interface AuthState {
 export type AuthAction =
   | {
       type: 'signup';
-      payload: {name: string; lastName: string; token: string; role: string};
+      payload: {
+        id: string;
+        name: string;
+        lastName: string;
+        token: string;
+        role: string;
+        picture: string;
+      };
     }
   | {type: 'logout'; payload: {}}
   | {
@@ -39,11 +47,16 @@ export type AuthAction =
         lastName: string;
         token: string;
         role: string;
+        picture: string;
       };
     }
   | {
       type: 'errorMessage';
       payload: {errorMessage: string; screen: 'signin' | 'signup'};
+    }
+  | {
+      type: 'loading';
+      payload: {};
     }
   | {
       type: 'clearErrorMessage';
@@ -65,7 +78,14 @@ const authReducer = (prevState: AuthState, action: AuthAction): AuthState => {
         ...prevState,
         token: action.payload.token,
         role: action.payload.role,
+        user: {
+          name: action.payload.name,
+          lastName: action.payload.lastName,
+          _id: '',
+          picture: action.payload.picture,
+        },
         errorMessage: null,
+        loading: false,
       };
     case 'logout':
       return {
@@ -81,6 +101,7 @@ const authReducer = (prevState: AuthState, action: AuthAction): AuthState => {
           name: action.payload.name,
           lastName: action.payload.lastName,
           _id: action.payload.id,
+          picture: action.payload.picture,
         },
         token: action.payload.token,
         role: action.payload.role,
@@ -88,10 +109,16 @@ const authReducer = (prevState: AuthState, action: AuthAction): AuthState => {
     case 'errorMessage':
       return {
         ...prevState,
+        loading: false,
         errorMessage: {
           message: action.payload.errorMessage,
           screen: action.payload.screen,
         },
+      };
+    case 'loading':
+      return {
+        ...prevState,
+        loading: true,
       };
     case 'clearErrorMessage':
       return {
@@ -105,18 +132,43 @@ const authReducer = (prevState: AuthState, action: AuthAction): AuthState => {
 
 const signup =
   (dispatch: Dispatch<AuthAction>) => async (body: UserRequestInterface) => {
+    const {imageUri, ...rest} = body;
+
+    const formData = new FormData();
+
+    if (imageUri) {
+      formData.append('picture', {
+        uri: imageUri,
+        type: 'image/jpeg',
+        name: 'image.jpg',
+      });
+    }
+
+    Object.entries(rest).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    dispatch({type: 'loading', payload: {}});
+
     try {
       const {data} = await dbApi.post<UserResponseLoginInterface>(
         '/customer',
-        body,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
       );
       dispatch({
         type: 'signup',
         payload: {
+          id: data._id,
           name: data.name,
           lastName: data.lastName,
           token: data.token,
           role: data.role,
+          picture: data.picture,
         },
       });
 
@@ -140,21 +192,29 @@ const signup =
 const signin =
   (dispatch: Dispatch<AuthAction>) => async (body: LoginInterface) => {
     try {
+      dispatch({type: 'loading', payload: {}});
+
       const {data} = await dbApi.post<UserResponseLoginInterface>(
         '/auth',
         body,
       );
-      dispatch({
-        type: 'signup',
-        payload: {
-          name: data.name,
-          lastName: data.lastName,
-          token: data.token,
-          role: data.role,
-        },
-      });
-      await AsyncStorage.setItem('token', data.token);
-      await AsyncStorage.setItem('role', data.role);
+
+      if (data.status === 'active') {
+        dispatch({
+          type: 'signup',
+          payload: {
+            id: data._id,
+            name: data.name,
+            lastName: data.lastName,
+            token: data.token,
+            role: data.role,
+            picture: data.picture,
+          },
+        });
+
+        await AsyncStorage.setItem('token', data.token);
+        await AsyncStorage.setItem('role', data.role);
+      }
     } catch (error) {
       if (axios.isAxiosError<ErrorResponseInterface>(error)) {
         dispatch({
@@ -182,9 +242,12 @@ const clearErrorMessage = (dispatch: Dispatch<AuthAction>) => () => {
 const checkToken = (dispatch: Dispatch<AuthAction>) => async () => {
   const token = await AsyncStorage.getItem('token');
   const role = await AsyncStorage.getItem('role');
+
   if (token && role) {
     try {
-      const {data} = await dbApi.get<UserResponseTokenInterface>('/user');
+      const {data} = await dbApi.get<UserResponseTokenInterface>(
+        '/user/by-token',
+      );
 
       dispatch({
         type: 'checkToken',
@@ -192,12 +255,14 @@ const checkToken = (dispatch: Dispatch<AuthAction>) => async () => {
           id: data._id,
           name: data.name,
           lastName: data.lastName,
+          picture: data.picture,
           token: token,
           role: role,
         },
       });
     } catch (error) {
       console.log(error);
+      signout(dispatch)();
     }
   }
 };
@@ -211,8 +276,10 @@ export const {Provider, Context} = dataContext<AuthContextProps>(
       name: '',
       lastName: '',
       _id: '',
+      picture: '',
     },
     errorMessage: null,
     role: null,
+    loading: false,
   },
 );

@@ -10,11 +10,9 @@ import {
 } from 'react-native';
 import {StackScreenProps} from '@react-navigation/stack';
 
-import InputSignup from '../components/InputSignup';
-
 import {globalColors} from '../styles/globalVariables';
 import Spacer from '../components/common/Spacer';
-import RegisterButton from '../components/common/PrincipalButton';
+import LoadingModal from '../components/common/LoadingModal';
 
 import {Context as AuthContext} from '../context/AuthContext';
 import {useForm} from '../hooks/useForm';
@@ -27,7 +25,7 @@ const FiscalScreen = ({route, navigation}: Props) => {
   const {
     signup,
     clearErrorMessage,
-    state: {errorMessage},
+    state: {errorMessage, loading},
   } = useContext(AuthContext);
   const {form} = route.params;
   const initialValues = {
@@ -69,6 +67,7 @@ const FiscalScreen = ({route, navigation}: Props) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {loading && <LoadingModal />}
       <Text style={styles.title}>Datos Fiscales</Text>
 
       <View style={styles.containerForm}>

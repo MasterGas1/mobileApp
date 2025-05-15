@@ -1,33 +1,51 @@
-import React, { useContext } from 'react'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import { StyleSheet, Text, View, Image, TouchableOpacity, } from 'react-native'
+import React, {useContext, useEffect} from 'react';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 
-import { globalColors } from '../../../styles/globalVariables'
+import {globalColors} from '../../../styles/globalVariables';
 import CustomOption from '../../../components/CustomOption';
 
-import { Context as AuthContext } from '../../../context/AuthContext';
+import {Context as AuthContext} from '../../../context/AuthContext';
+import {relativeFontSize} from '../../../helper/relativeFontSize';
 
 const ProfileScreen = () => {
-
-  const { signout } = useContext(AuthContext)
+  const {
+    signout,
+    state: {user},
+  } = useContext(AuthContext);
 
   return (
     <View style={styles.container}>
       <View style={styles.header} />
       <View style={styles.profileSection}>
         <Image
-          source={{ uri: 'https://avatarfiles.alphacoders.com/693/thumb-1920-69306.jpg' }} // Reemplaza con la URL de la imagen de perfil
+          source={{
+            uri: user.picture,
+          }}
           style={styles.profileImage}
         />
         <TouchableOpacity style={styles.editIconContainer}>
           <Ionicons name="pencil-outline" size={25} color={'white'} />
         </TouchableOpacity>
-        <Text style={styles.profileName}>Adela Micha</Text>
+        <Text style={styles.profileName}>
+          {user.name.split(' ')[0]} {user.lastName.split(' ')[0]}
+        </Text>
       </View>
       <View style={styles.optionsSection}>
-        <CustomOption icon="pencil-outline" text="Editar perfil" onPress={() => {}}/>
-        <CustomOption icon="key" text="Cambiar contraseña"  onPress={() => {}}/>
-        <CustomOption icon="exit" text="Cerrar sesión"  onPress={signout}/>
+        <CustomOption
+          icon="pencil-outline"
+          text="Editar perfil"
+          onPress={() => {}}
+        />
+        <CustomOption icon="key" text="Cambiar contraseña" onPress={() => {}} />
+        <CustomOption icon="exit" text="Cerrar sesión" onPress={signout} />
       </View>
     </View>
   );
@@ -39,7 +57,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   header: {
-    height: "30%",
+    height: '30%',
     backgroundColor: globalColors.principalColor,
   },
   profileSection: {
@@ -47,23 +65,27 @@ const styles = StyleSheet.create({
     marginTop: -75,
   },
   profileImage: {
-    width: 160,
-    height: 160,
-    borderRadius: 75,
+    width: Dimensions.get('window').width * 0.4,
+    height: Dimensions.get('window').width * 0.4,
+    borderRadius: Dimensions.get('window').width * 0.2,
     borderWidth: 4,
     borderColor: 'white',
   },
   editIconContainer: {
+    width: Dimensions.get('window').width * 0.08,
+    height: Dimensions.get('window').width * 0.08,
     position: 'absolute',
-    right: 130,
-    bottom: 40,
+    right: '35%',
+    top: '65%',
     backgroundColor: '#004d40',
     borderRadius: 50,
     padding: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   profileName: {
     marginTop: 10,
-    fontSize: 24,
+    fontSize: relativeFontSize(25),
     fontWeight: 'bold',
     color: '#004d40',
   },
@@ -73,5 +95,4 @@ const styles = StyleSheet.create({
   },
 });
 
-
-export default ProfileScreen
+export default ProfileScreen;

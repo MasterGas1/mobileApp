@@ -7,10 +7,14 @@ import {
   KeyboardAvoidingView,
   Alert,
   SafeAreaView,
+  TouchableOpacity,
+  Image,
 } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
+import {launchImageLibrary} from 'react-native-image-picker';
 
 import Spacer from '../components/common/Spacer';
 import {Button, TextInput} from '../components/common';
@@ -22,6 +26,7 @@ import {globalColors} from '../styles/globalVariables';
 import {useForm} from '../hooks/useForm';
 
 import dbApi from '../api/DbApi';
+
 import {ErrorResponseInterface} from '../interface/errorResponse';
 
 type LoginScreenNavigationProp = StackNavigationProp<
@@ -36,12 +41,14 @@ const SignupScreen = () => {
     'Las contraseñas no coinciden',
   );
   const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const initialValues = {
     name: '',
     lastName: '',
     email: '',
     password: '',
+    imageUri: '',
   };
 
   const validations = {
@@ -75,6 +82,7 @@ const SignupScreen = () => {
       setConfirmPasswordTouched(true);
     } else {
       try {
+        setLoading(true);
         await dbApi.post('/user/validateEmail', {
           email: values.email,
           roleName: 'Customer',
@@ -86,6 +94,8 @@ const SignupScreen = () => {
         } else {
           console.log(error);
         }
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -95,6 +105,7 @@ const SignupScreen = () => {
     lastName,
     email,
     password,
+    imageUri,
     errors,
     touched,
     onChange,
@@ -109,12 +120,41 @@ const SignupScreen = () => {
     }
   };
 
+  const pickImage = async () => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        selectionLimit: 1,
+      },
+      response => {
+        if (response.didCancel) {
+          console.log('Usuario canceló');
+        } else if (response.errorCode) {
+          Alert.alert('Error', response.errorMessage || 'Ocurrió un error');
+        } else {
+          const uri = response.assets?.[0]?.uri;
+          if (uri) {
+            onChange(uri, 'imageUri');
+          }
+        }
+      },
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Registro</Text>
 
       <ScrollView style={styles.containerForm}>
         <KeyboardAvoidingView>
+          <TouchableOpacity style={styles.cameraButton} onPress={pickImage}>
+            {imageUri ? (
+              <Image source={{uri: imageUri}} style={styles.image} />
+            ) : (
+              <Ionicons name="camera-outline" size={30} color={'white'} />
+            )}
+          </TouchableOpacity>
+
           <TextInput
             label="Nombre (s)"
             value={name}
@@ -174,6 +214,7 @@ const SignupScreen = () => {
         styleContainer={{
           width: '90%',
         }}
+        loading={loading}
       />
     </SafeAreaView>
   );
@@ -210,6 +251,21 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 15,
     fontWeight: 'bold',
+  },
+  cameraButton: {
+    alignSelf: 'center',
+    backgroundColor: globalColors.principalColor,
+    width: Dimensions.get('window').width * 0.25,
+    height: Dimensions.get('window').width * 0.25,
+    borderRadius: 99,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 50,
   },
 });
 
