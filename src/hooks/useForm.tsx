@@ -11,8 +11,8 @@ export const useForm = <T extends Object>(
   onSubmit?: (form: T) => void,
 ) => {
   const [state, setState] = useState(initState);
-  const [errors, setErrors] = useState<Record<keyof T, string | null>>(
-    {} as Record<keyof T, string | null>,
+  const [errors, setErrors] = useState<Record<keyof T, string | undefined>>(
+    {} as Record<keyof T, string | undefined>,
   );
   const [touched, setTouched] = useState<Record<keyof T, boolean>>(
     {} as Record<keyof T, boolean>,
@@ -81,6 +81,19 @@ export const useForm = <T extends Object>(
     return errors;
   };
 
+  const updateValues = (values: Partial<T>) => {
+    setState({
+      ...state,
+      ...values,
+    });
+  };
+
+  const resetForm = () => {
+    setState(initState);
+    setErrors({} as Record<keyof T, string | undefined>);
+    setTouched({} as Record<keyof T, boolean>);
+  };
+
   return {
     ...state,
     errors,
@@ -88,5 +101,7 @@ export const useForm = <T extends Object>(
     touched,
     onChange,
     handleSubmit,
+    resetForm,
+    updateValues,
   };
 };
