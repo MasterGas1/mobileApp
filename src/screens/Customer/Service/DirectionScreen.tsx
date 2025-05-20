@@ -3,6 +3,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import {
   Dimensions,
   FlatList,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -16,15 +17,21 @@ import {globalColors} from '../../../styles/globalVariables';
 
 import {useLocation} from '../../../hooks/useLocation';
 import PrincipalButton from '../../../components/common/PrincipalButton';
-import ModalAddress from '../../../components/ModalAddress';
-import AddressButton from '../../../components/AddressButton';
+import ModalAddress from '../../../components/address/ModalAddress';
+import AddressButton from '../../../components/address/AddressButton';
+import ModallEditAddress from '../../../components/address/ModallEditAddress';
 
 import {Context as AddressContext} from '../../../context/AddressContext';
 import {Context as SocketContext} from '../../../context/SocketContext';
 import {Context as AuthContext} from '../../../context/AuthContext';
 
 import {RootStackParams} from '../../../navigation/Customer/ServiceStackNavigator';
+
 import {ResponseCreateRequestInterface} from '../../../interface/requestInterface';
+import {
+  AddressInterface,
+  AddressResponseInterface,
+} from '../../../interface/addressInterface';
 
 type Props = StackScreenProps<RootStackParams, 'DirectionScreen'>;
 
@@ -39,9 +46,19 @@ const DirectionScreen = ({route, navigation}: Props) => {
     state: {user},
   } = useContext(AuthContext);
 
-  const {getCurrentLocation, setNewLocation, location, address} = useLocation();
+  const {
+    getCurrentLocation,
+    setNewLocation,
+    location,
+    address,
+    currentLocation,
+  } = useLocation();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpenEdit, setIsOpenEdit] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState<string>('');
+  const [selectedAddressUpdate, setSelectedAddressUpdate] =
+    useState<AddressResponseInterface>();
 
   useEffect(() => {
     getCurrentLocation();
@@ -63,6 +80,11 @@ const DirectionScreen = ({route, navigation}: Props) => {
   return (
     <View style={styles.container}>
       <ModalAddress isOpen={isOpen} setIsOpen={setIsOpen} />
+      <ModallEditAddress
+        isOpen={isOpenEdit}
+        setIsOpen={setIsOpenEdit}
+        address={selectedAddressUpdate!}
+      />
 
       <MapView
         initialRegion={{
@@ -86,53 +108,75 @@ const DirectionScreen = ({route, navigation}: Props) => {
           }}
         />
       </MapView>
+
       <View style={styles.containerInfo}>
-        <View style={{width: '70%'}}>
-          <Text style={styles.textTitleDirection}>Ubicación actual</Text>
-          <Text style={styles.textAddress}>{address}</Text>
+        <View
+          style={{
+            width: '100%',
+            alignItems: 'flex-end',
+          }}>
+          <TouchableOpacity
+            onPress={() => {
+              setIsOpen(true);
+            }}
+            style={styles.buttonAdd}>
+            <Icon name="add-outline" size={30} color="white" />
+          </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={styles.buttonAdd}
-          onPress={() => setIsOpen(true)}>
-          <Icon name="add" size={30} color="white" />
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.textTitleList}>Direcciones guardas</Text>
-      <FlatList
-        data={state.addresses}
-        keyExtractor={item => item._id}
-        style={styles.containerList}
-        renderItem={({item}) => (
+        <ScrollView
+          style={styles.containerList}
+          showsVerticalScrollIndicator={false}>
           <AddressButton
-            name={item.name}
-            addressName={item.addressName}
-            key={item._id}
-            onPress={() =>
+            name="Mi ubicación"
+            addressName={address}
+            isSelected={selectedAddress === ''}
+            isCurrentLocation
+            onPress={() => {
               setNewLocation(
-                item.coordinates.latitude,
-                item.coordinates.longitude,
-              )
-            }
+                currentLocation.latitude,
+                currentLocation.longitude,
+              );
+              setSelectedAddress('');
+            }}
           />
-        )}
-      />
+          {state.addresses.map(address => (
+            <AddressButton
+              name={address.name}
+              addressName={address.addressName}
+              key={address._id}
+              isCurrentLocation={false}
+              isSelected={selectedAddress === address._id}
+              onPress={() => {
+                setNewLocation(
+                  address.coordinates.latitude,
+                  address.coordinates.longitude,
+                );
+                setSelectedAddress(address._id);
+              }}
+              onEditPress={() => {
+                setIsOpenEdit(true);
+                setSelectedAddressUpdate(address);
+              }}
+            />
+          ))}
+        </ScrollView>
 
-      <PrincipalButton
-        label="Siguiente"
-        onPress={() => {
-          socket?.emit('create-request', {
-            customerId: user?._id,
-            addressName: address,
-            serviceId: serviceId,
-            coordinates: {
-              latitude: location.latitude,
-              longitude: location.longitude,
-            },
-          });
-        }}
-      />
+        <PrincipalButton
+          label="Siguiente"
+          onPress={() => {
+            socket?.emit('create-request', {
+              customerId: user?._id,
+              addressName: address,
+              serviceId: serviceId,
+              coordinates: {
+                latitude: location.latitude,
+                longitude: location.longitude,
+              },
+            });
+          }}
+        />
+      </View>
     </View>
   );
 };
@@ -141,17 +185,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    padding: 20,
+    backgroundColor: globalColors.principalColor,
   },
   map: {
     width: '100%',
-    height: '40%',
+    height: '60%',
+    borderRadius: 20,
   },
   containerInfo: {
     width: '100%',
     marginTop: 10,
-    flexDirection: 'row',
     justifyContent: 'space-between',
+    backgroundColor: 'white',
+    position: 'absolute',
+    bottom: 0,
+    height: '50%',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    padding: 10,
   },
   textTitleDirection: {
     fontSize: Dimensions.get('window').width * 0.04,
@@ -184,6 +235,7 @@ const styles = StyleSheet.create({
   },
   containerList: {
     width: '100%',
+    marginTop: 5,
   },
 });
 
