@@ -40,7 +40,7 @@ const DirectionScreen = ({route, navigation}: Props) => {
 
   const {state, getAddresses} = useContext(AddressContext);
   const {
-    state: {socket},
+    state: {socketService, connected},
   } = useContext(SocketContext);
   const {
     state: {user},
@@ -70,12 +70,15 @@ const DirectionScreen = ({route, navigation}: Props) => {
   }, [state.addresses]);
 
   useEffect(() => {
-    if (socket && socket.socket?.id) {
-      socket.on(socket.socket.id, (data: ResponseCreateRequestInterface) => {
-        navigation.navigate('OrderScreen', {request: data});
-      });
+    if (connected && socketService?.socket?.id) {
+      socketService.on(
+        socketService.socket.id,
+        (data: ResponseCreateRequestInterface) => {
+          navigation.navigate('OrderScreen', {request: data});
+        },
+      );
     }
-  }, [socket]);
+  }, [connected]);
 
   return (
     <View style={styles.container}>
@@ -165,7 +168,7 @@ const DirectionScreen = ({route, navigation}: Props) => {
         <PrincipalButton
           label="Siguiente"
           onPress={() => {
-            socket?.emit('create-request', {
+            socketService?.emit('create-request', {
               customerId: user?._id,
               addressName: address,
               serviceId: serviceId,

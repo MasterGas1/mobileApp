@@ -22,7 +22,7 @@ const InstallerNavigator = () => {
   const mounted = useRef(false);
 
   const {
-    state: {socket},
+    state: {socketService},
   } = useContext(SocketContext);
 
   const {
@@ -37,8 +37,8 @@ const InstallerNavigator = () => {
     const watchId = Geolocation.watchPosition(
       ({coords}) => {
         const {latitude, longitude} = coords;
-        if (socket) {
-          socket.emit('update-installer-coordinates', {
+        if (socketService) {
+          socketService.emit('update-installer-coordinates', {
             latitude,
             longitude,
             userId: user._id,
@@ -55,7 +55,7 @@ const InstallerNavigator = () => {
     );
 
     return () => Geolocation.clearWatch(watchId);
-  }, [socket]);
+  }, [socketService]);
 
   useEffect(() => {
     getOrder();

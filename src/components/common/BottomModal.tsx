@@ -1,16 +1,25 @@
 import React from 'react';
-import {Modal, SafeAreaView, StyleSheet, View} from 'react-native';
+import {
+  DimensionValue,
+  Modal,
+  SafeAreaView,
+  StyleSheet,
+  View,
+} from 'react-native';
 
 interface BottonModalProps {
   visible: boolean;
+  height?: DimensionValue;
   children: JSX.Element[] | JSX.Element;
 }
 
-const BottonModal = ({visible, children}: BottonModalProps) => {
+const BottonModal = ({visible, height, children}: BottonModalProps) => {
   return (
     <Modal animationType="slide" transparent={true} visible={visible}>
       <View style={styles.container}>
-        <SafeAreaView style={styles.modalContainer}>{children}</SafeAreaView>
+        <SafeAreaView style={[styles.modalContainer, {height: height}]}>
+          {children}
+        </SafeAreaView>
       </View>
     </Modal>
   );
