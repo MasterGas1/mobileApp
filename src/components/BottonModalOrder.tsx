@@ -4,7 +4,7 @@ import MapView, {Marker} from 'react-native-maps';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MapViewDirections from 'react-native-maps-directions';
 
-import BottonModal from './common/BottonModal';
+import BottonModal from './common/BottomModal';
 
 import googleApiKey from '../constants/googleApiKey';
 

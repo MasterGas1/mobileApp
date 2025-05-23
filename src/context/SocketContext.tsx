@@ -4,7 +4,8 @@ import socketService from '../api/Socket';
 import dataContext from './dataContext';
 
 export interface SocketState {
-  socket: typeof socketService | null;
+  socketService: typeof socketService | null;
+  connected: boolean;
   errorMessage: string;
 }
 
@@ -20,7 +21,8 @@ const socketReducer = (state: SocketState, action: SocketAction) => {
     case 'connect':
       return {
         ...state,
-        socket: action.payload,
+        connected: true,
+        socketService: action.payload,
       };
     default:
       return state;
@@ -29,10 +31,14 @@ const socketReducer = (state: SocketState, action: SocketAction) => {
 
 const connect = (dispatch: Dispatch<SocketAction>) => async () => {
   await socketService.connect();
-  if (socketService.socket) {
+  if (socketService.socket?.connected) {
+    console.log('Socket ID:', socketService.socket.id);
     dispatch({type: 'connect', payload: socketService});
   } else {
-    console.error('Socket not connected');
+    socketService.socket?.on('connect', () => {
+      console.log('Socket ID (desde evento):', socketService.socket?.id);
+      dispatch({type: 'connect', payload: socketService});
+    });
   }
 };
 
@@ -44,5 +50,6 @@ export const {Provider, Context} = dataContext<SocketContextProps>(
   {
     socket: socketService,
     errorMessage: '',
+    connected: false,
   },
 );

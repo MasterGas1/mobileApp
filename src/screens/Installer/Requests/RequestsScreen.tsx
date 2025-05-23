@@ -15,10 +15,11 @@ import {Context as OrderContext} from '../../../context/OrderContext';
 
 import {ResponseCreateRequestInterface} from '../../../interface/requestInterface';
 import {OrderResponseInterface} from '../../../interface/orderInterface';
+import {globalColors} from '../../../styles/globalVariables';
 
 const RequestsScreen = () => {
   const {
-    state: {socket},
+    state: {socketService, connected},
   } = useContext(SocketContext);
 
   const {
@@ -32,69 +33,81 @@ const RequestsScreen = () => {
   const {request, requestSelected, addRequest, getOneRequest, clearRequest} =
     useRquest();
 
-  const acceptRequest = () => {
-    if (socket) {
-      socket.emit('accept-request', {
-        requestId: requestSelected?._id,
-        userId: requestSelected?.installerId._id,
-      });
-      setVisible(false);
-    }
-  };
+  // const acceptRequest = () => {
+  //   if (socket) {
+  //     socket.emit('accept-request', {
+  //       requestId: requestSelected?._id,
+  //       userId: requestSelected?.installerId._id,
+  //     });
+  //     setVisible(false);
+  //   }
+  // };
 
   useEffect(() => {
-    if (socket && socket.socket?.id) {
-      socket.on(socket.socket.id, (data: ResponseCreateRequestInterface) => {
-        addRequest(data);
-      });
-    }
-  }, [socket?.socket?.connected]);
-
-  useEffect(() => {
-    if (socket && requestSelected) {
-      socket.on(
-        `request-accepted-${requestSelected._id}`,
-        (data: OrderResponseInterface) => {
-          setVisibleOrder(true);
-          setOrder(data);
+    if (connected && socketService) {
+      socketService.on(
+        socketService.socket?.id as string,
+        (data: ResponseCreateRequestInterface) => {
+          addRequest(data);
         },
       );
     }
-  }, [socket?.socket?.connected, requestSelected]);
+  }, [connected]);
+
+  // useEffect(() => {
+  //   if (socket && requestSelected) {
+  //     socket.on(
+  //       `request-accepted-${requestSelected._id}`,
+  //       (data: OrderResponseInterface) => {
+  //         setVisibleOrder(true);
+  //         setOrder(data);
+  //       },
+  //     );
+  //   }
+  // }, [socket?.socket?.connected, requestSelected]);
 
   return (
     <View style={styles.container}>
-      {orderGlobal && <OrderInProgress onPress={() => setVisibleOrder(true)} />}
-
-      <FlatList
-        data={request}
-        renderItem={({item}) => (
-          <RequestIntallerButton
-            name={item.customerId.name + ' ' + item.customerId.lastName}
-            service={item.serviceId.name}
-            srcImage={item.customerId.picture}
-            onPress={() => {
-              getOneRequest(item._id);
-              setVisible(true);
-            }}
-          />
+      <View style={styles.containerRequest}>
+        {orderGlobal && (
+          <OrderInProgress onPress={() => setVisibleOrder(true)} />
         )}
-      />
-      <ModalRequestInfo
-        visible={visible}
-        setVisible={setVisible}
-        request={requestSelected}
-        acceptRequest={acceptRequest}
-      />
 
-      <BottonModalOrder
-        visible={visibleOrder}
-        order={order}
-        closeModal={() => {
-          setVisibleOrder(false);
-          setOrder(undefined);
-        }}
-      />
+        <FlatList
+          data={request}
+          style={{
+            flex: 1,
+            marginTop: 20,
+            paddingHorizontal: 20,
+          }}
+          renderItem={({item}) => (
+            <RequestIntallerButton
+              name={item.customerId.name + ' ' + item.customerId.lastName}
+              service={item.serviceId.name}
+              srcImage={item.customerId.picture}
+              onPress={() => {
+                getOneRequest(item._id);
+                setVisible(true);
+              }}
+            />
+          )}
+        />
+        <ModalRequestInfo
+          visible={visible}
+          setVisible={setVisible}
+          request={requestSelected}
+          acceptRequest={() => {}}
+        />
+
+        <BottonModalOrder
+          visible={visibleOrder}
+          order={order}
+          closeModal={() => {
+            setVisibleOrder(false);
+            setOrder(undefined);
+          }}
+        />
+      </View>
     </View>
   );
 };
@@ -104,8 +117,13 @@ export default RequestsScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingTop: 5,
+    paddingTop: 10,
+    backgroundColor: globalColors.principalColor,
+  },
+  containerRequest: {
+    flex: 1,
+    backgroundColor: 'white',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
   },
 });
